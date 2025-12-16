@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "create-admin": "node scripts/create-admin.js"
+    "create-admin": "node scripts/create-admin.js",
+    "migrate-companies": "node scripts/migrate-companies.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.87.3",

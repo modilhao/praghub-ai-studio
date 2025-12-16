@@ -50,8 +50,7 @@ export const CompanyProfile: React.FC = () => {
                     imageUrl: data.image_url,
                     whatsapp: data.whatsapp,
                     isPremium: data.is_premium || false,
-                    status: data.status || 'Pendente',
-                    cnpj: data.cnpj
+                    status: data.status || 'Pendente'
                 };
                 setCompany(mappedCompany);
             } else {

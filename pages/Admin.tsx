@@ -80,8 +80,7 @@ export const Admin: React.FC = () => {
                     imageUrl: item.image_url,
                     whatsapp: item.whatsapp,
                     isPremium: item.is_premium || false,
-                    status: item.status || 'Pendente',
-                    cnpj: item.cnpj
+                    status: item.status || 'Pendente'
                 }));
                 setCompanies(mappedCompanies);
             }
@@ -373,7 +372,6 @@ export const Admin: React.FC = () => {
                                                         )}
                                                         <div>
                                                             <p className="font-bold text-white text-sm">{company.name}</p>
-                                                            <p className="text-xs text-text-secondary">CNPJ: {company.cnpj}</p>
                                                         </div>
                                                     </div>
                                                 </td>
