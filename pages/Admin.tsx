@@ -1,64 +1,161 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../src/lib/supabase';
 import { Company } from '../types';
-
-const ADMIN_COMPANIES: Company[] = [
-    {
-        id: '1',
-        name: 'Dedetizadora Rápida',
-        location: 'São Paulo',
-        shortLocation: 'SP - Centro',
-        whatsapp: '(11) 99999-0000',
-        status: 'Aprovado',
-        rating: 0, reviews: 0, tags: [],
-        imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDHPooG8PLRJ0KAQ5YhwLXbXxaUvjSfZxzECV4xBU7l04tolcLaLaUsF0EIpnU1u2Fv20ND-gxvSBDhY5gKZ_h6l1rK0DfkBZYdgaelup9kt29gHtYW2Gfz3TsyvRAv1kDeS29UehrGzLlarQxaafqdubiEs7RhO4Hmt_ymgO6ffVsVzm6cjPNellayHse7PmMbhynXI6kIrEmDNK3Yyn9W4FIoWLBXnABKPry4AVy-HEO_elvUv8BqyMwU5WGYjHF-iwyI1BTZ5tlH',
-        isPremium: true,
-        cnpj: '12.345.678/0001-99'
-    },
-    {
-        id: '2',
-        name: 'Inseto Zero',
-        location: 'Campinas',
-        shortLocation: 'SP - Cambuí',
-        whatsapp: '(19) 98888-7777',
-        status: 'Pendente',
-        rating: 0, reviews: 0, tags: [],
-        initials: 'IZ',
-        isPremium: false,
-        cnpj: '98.765.432/0001-11'
-    },
-    {
-        id: '3',
-        name: 'BioControl RJ',
-        location: 'Rio de Janeiro',
-        shortLocation: 'RJ - Barra',
-        whatsapp: '(21) 97777-6666',
-        status: 'Rejeitado',
-        rating: 0, reviews: 0, tags: [],
-        imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA6FTVIEVgUrC2lpXPHlpsXofYGzx1C5cW3iHBbx7gz5OMAkOyMbNZPLO9WGtXxNn8yKZnEM7VDgFBdNVnDirmMpIf0x4AoFJbmWGuM1GMKb2YQQR0JRrlFvso-bWXb1OpEw7UEoo5E1_QAJU-yR2bSXoOmanRjJx_C5M7PFw0WlpOp3xXTIz2uVqYr9wMrJaSA7jGGPve1Q2vdpJiy4_EFLysO8G3D5dJ2n--__Vf8YKxLKxSOZ-Ewqf_kbY7sYIOSjsZ_Ex0v3GSm',
-        isPremium: false,
-        cnpj: '45.123.789/0001-55'
-    }
-];
+import { getCompanyInitials } from '../src/lib/utils';
+import { useAuth } from '../src/contexts/AuthContext';
 
 export const Admin: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'dashboard' | 'companies'>('dashboard');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [toastVisible, setToastVisible] = useState(false);
     const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+    const [companies, setCompanies] = useState<Company[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState<'Todos' | 'Pendente' | 'Aprovado' | 'Rejeitado'>('Todos');
+    const [premiumFilter, setPremiumFilter] = useState<'Todos' | 'Premium' | 'Não Premium'>('Todos');
     const navigate = useNavigate();
+    const { signOut } = useAuth();
 
-    const handleLogout = () => navigate('/login');
+    useEffect(() => {
+        if (activeTab === 'companies') {
+            fetchCompanies();
+        } else {
+            // Garantir que loading seja false quando estiver na aba dashboard
+            setLoading(false);
+        }
+    }, [activeTab, statusFilter, premiumFilter, searchQuery]);
+
+    const fetchCompanies = async () => {
+        try {
+            setLoading(true);
+            let query = supabase
+                .from('companies')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            // Aplicar filtros
+            if (statusFilter !== 'Todos') {
+                query = query.eq('status', statusFilter);
+            }
+
+            if (premiumFilter === 'Premium') {
+                query = query.eq('is_premium', true);
+            } else if (premiumFilter === 'Não Premium') {
+                query = query.eq('is_premium', false);
+            }
+
+            // Aplicar busca
+            if (searchQuery.trim()) {
+                query = query.or(`name.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%,slug.ilike.%${searchQuery}%`);
+            }
+
+            const { data, error } = await query;
+
+            if (error) {
+                console.error('Error fetching companies:', error);
+                setCompanies([]);
+                return;
+            }
+
+            if (data) {
+                const mappedCompanies: Company[] = data.map((item) => ({
+                    id: item.slug, // Usando slug como id para consistência
+                    slug: item.slug,
+                    name: item.name,
+                    rating: item.rating || 0,
+                    reviews: item.reviews || 0,
+                    location: item.location || '',
+                    shortLocation: item.short_location || '',
+                    description: item.description,
+                    cep: item.cep,
+                    street: item.street,
+                    number: item.number,
+                    neighborhood: item.neighborhood,
+                    city: item.city,
+                    state: item.state,
+                    tags: item.tags || [],
+                    specialties: item.specialties || [],
+                    imageUrl: item.image_url,
+                    whatsapp: item.whatsapp,
+                    isPremium: item.is_premium || false,
+                    status: item.status || 'Pendente',
+                    cnpj: item.cnpj
+                }));
+                setCompanies(mappedCompanies);
+            }
+        } catch (error) {
+            console.error('Unexpected error:', error);
+            setCompanies([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUpdateCompany = async (companyId: string, updates: Partial<Company>) => {
+        try {
+            // Converter camelCase para snake_case
+            const dbUpdates: any = {};
+            if (updates.status) dbUpdates.status = updates.status;
+            if (updates.isPremium !== undefined) dbUpdates.is_premium = updates.isPremium;
+            if (updates.name) dbUpdates.name = updates.name;
+            if (updates.whatsapp) dbUpdates.whatsapp = updates.whatsapp;
+            if (updates.location) dbUpdates.location = updates.location;
+
+            const { error } = await supabase
+                .from('companies')
+                .update(dbUpdates)
+                .eq('slug', companyId); // Usar slug para identificar
+
+            if (error) throw error;
+
+            // Atualizar lista local
+            setCompanies(prev => prev.map(c => 
+                c.id === companyId ? { ...c, ...updates } : c
+            ));
+
+            setToastVisible(true);
+            setTimeout(() => setToastVisible(false), 3000);
+        } catch (error) {
+            console.error('Error updating company:', error);
+            alert('Erro ao atualizar empresa.');
+        }
+    };
+
+    const handleLogout = async () => {
+        await signOut();
+        navigate('/login');
+    };
     
     const handleEdit = (company: Company) => {
         setSelectedCompany(company);
         setIsModalOpen(true);
     };
 
-    const handleSave = () => {
+    const handleSave = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedCompany) return;
+        
+        const form = e.currentTarget as HTMLFormElement;
+        const formData = new FormData(form);
+        
+        const status = (formData.get('status') as string) || selectedCompany.status;
+        const isPremiumCheckbox = form.querySelector('input[name="isPremium"]') as HTMLInputElement;
+        const isPremium = isPremiumCheckbox?.checked ?? selectedCompany.isPremium;
+        const name = (formData.get('name') as string) || selectedCompany.name;
+        const whatsapp = (formData.get('whatsapp') as string) || selectedCompany.whatsapp;
+        const location = (formData.get('location') as string) || selectedCompany.location;
+
+        handleUpdateCompany(selectedCompany.id, {
+            status: status as 'Pendente' | 'Aprovado' | 'Rejeitado',
+            isPremium,
+            name,
+            whatsapp,
+            location
+        });
+
         setIsModalOpen(false);
-        setToastVisible(true);
-        setTimeout(() => setToastVisible(false), 3000);
     };
 
     return (
@@ -189,19 +286,49 @@ export const Admin: React.FC = () => {
                             <div className="flex flex-col md:flex-row gap-4 items-center bg-surface-dark p-2 rounded-2xl border border-surface-border">
                                 <div className="relative flex-1 w-full">
                                     <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">search</span>
-                                    <input className="w-full bg-[#1e232b] border-none rounded-xl py-2.5 pl-10 pr-4 text-white placeholder-text-secondary focus:ring-1 focus:ring-primary text-sm" placeholder="Buscar por nome, cidade ou ID..." type="text"/>
+                                    <input 
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="w-full bg-[#1e232b] border-none rounded-xl py-2.5 pl-10 pr-4 text-white placeholder-text-secondary focus:ring-1 focus:ring-primary text-sm" 
+                                        placeholder="Buscar por nome, cidade ou slug..." 
+                                        type="text"
+                                    />
+                                    {searchQuery && (
+                                        <button 
+                                            onClick={() => setSearchQuery('')}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-white"
+                                            type="button"
+                                        >
+                                            <span className="material-symbols-outlined text-[18px]">close</span>
+                                        </button>
+                                    )}
                                 </div>
                                 <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 px-1 no-scrollbar">
-                                    <button className="flex items-center gap-2 px-4 py-2 bg-[#1e232b] hover:bg-surface-border rounded-full text-white text-sm border border-transparent hover:border-surface-border transition-all whitespace-nowrap">
-                                        <span>Status:</span>
-                                        <span className="font-bold text-primary">Todos</span>
-                                        <span className="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
-                                    </button>
-                                    <button className="flex items-center gap-2 px-4 py-2 bg-[#1e232b] hover:bg-surface-border rounded-full text-white text-sm border border-transparent hover:border-surface-border transition-all whitespace-nowrap">
-                                        <span>Premium:</span>
-                                        <span className="font-bold text-white">Todos</span>
-                                        <span className="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
-                                    </button>
+                                    <div className="relative">
+                                        <select 
+                                            value={statusFilter}
+                                            onChange={(e) => setStatusFilter(e.target.value as any)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-[#1e232b] hover:bg-surface-border rounded-full text-white text-sm border border-transparent hover:border-surface-border transition-all whitespace-nowrap appearance-none pr-8 cursor-pointer"
+                                        >
+                                            <option value="Todos">Status: Todos</option>
+                                            <option value="Pendente">Status: Pendente</option>
+                                            <option value="Aprovado">Status: Aprovado</option>
+                                            <option value="Rejeitado">Status: Rejeitado</option>
+                                        </select>
+                                        <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none text-[18px]">keyboard_arrow_down</span>
+                                    </div>
+                                    <div className="relative">
+                                        <select 
+                                            value={premiumFilter}
+                                            onChange={(e) => setPremiumFilter(e.target.value as any)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-[#1e232b] hover:bg-surface-border rounded-full text-white text-sm border border-transparent hover:border-surface-border transition-all whitespace-nowrap appearance-none pr-8 cursor-pointer"
+                                        >
+                                            <option value="Todos">Premium: Todos</option>
+                                            <option value="Premium">Premium: Sim</option>
+                                            <option value="Não Premium">Premium: Não</option>
+                                        </select>
+                                        <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none text-[18px]">keyboard_arrow_down</span>
+                                    </div>
                                 </div>
                             </div>
                         </header>
@@ -219,14 +346,30 @@ export const Admin: React.FC = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-surface-border">
-                                        {ADMIN_COMPANIES.map(company => (
+                                        {loading ? (
+                                            <tr>
+                                                <td colSpan={6} className="p-8 text-center text-text-secondary">
+                                                    <div className="flex items-center justify-center gap-2">
+                                                        <span className="material-symbols-outlined animate-spin">refresh</span>
+                                                        <span>Carregando empresas...</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ) : companies.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={6} className="p-8 text-center text-text-secondary">
+                                                    Nenhuma empresa encontrada.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            companies.map(company => (
                                             <tr key={company.id} className="group hover:bg-[#1c222c] transition-colors">
                                                 <td className="p-4 pl-6">
                                                     <div className="flex items-center gap-3">
                                                         {company.imageUrl ? (
                                                             <div className="size-10 rounded-lg bg-gray-700 bg-cover bg-center" style={{backgroundImage: `url('${company.imageUrl}')`}}></div>
                                                         ) : (
-                                                            <div className="size-10 rounded-lg bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-400 border border-gray-600">{company.initials}</div>
+                                                            <div className="size-10 rounded-lg bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-400 border border-gray-600">{getCompanyInitials(company.name)}</div>
                                                         )}
                                                         <div>
                                                             <p className="font-bold text-white text-sm">{company.name}</p>
@@ -277,7 +420,8 @@ export const Admin: React.FC = () => {
                                                     </div>
                                                 </td>
                                             </tr>
-                                        ))}
+                                            ))
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
@@ -314,15 +458,16 @@ export const Admin: React.FC = () => {
                                     <span className="material-symbols-outlined">close</span>
                                 </button>
                             </div>
+                            <form onSubmit={handleSave}>
                             <div className="p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-background-dark/50 rounded-xl border border-surface-border/50">
                                     <div className="flex flex-col gap-2">
                                         <label className="text-xs font-bold uppercase text-text-secondary tracking-wider">Status do Cadastro</label>
                                         <div className="relative">
-                                            <select defaultValue={selectedCompany.status} className="w-full bg-[#1e232b] border border-surface-border text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 appearance-none">
-                                                <option>Pendente</option>
-                                                <option>Aprovado</option>
-                                                <option>Rejeitado</option>
+                                            <select name="status" defaultValue={selectedCompany.status} className="w-full bg-[#1e232b] border border-surface-border text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 appearance-none">
+                                                <option value="Pendente">Pendente</option>
+                                                <option value="Aprovado">Aprovado</option>
+                                                <option value="Rejeitado">Rejeitado</option>
                                             </select>
                                             <span className="material-symbols-outlined absolute right-3 top-2.5 text-text-secondary pointer-events-none">expand_more</span>
                                         </div>
@@ -330,7 +475,7 @@ export const Admin: React.FC = () => {
                                     <div className="flex flex-col gap-2 justify-center">
                                         <label className="text-xs font-bold uppercase text-text-secondary tracking-wider mb-1">Destaque Premium</label>
                                         <label className="inline-flex items-center cursor-pointer group">
-                                            <input defaultChecked={selectedCompany.isPremium} className="sr-only peer" type="checkbox"/>
+                                            <input name="isPremium" defaultChecked={selectedCompany.isPremium} className="sr-only peer" type="checkbox"/>
                                             <div className="relative w-14 h-7 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary"></div>
                                             <span className="ms-3 text-sm font-medium text-text-secondary group-hover:text-white transition-colors">Ativado</span>
                                         </label>
@@ -339,20 +484,20 @@ export const Admin: React.FC = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="col-span-1 md:col-span-2 space-y-1">
                                         <label className="text-sm font-medium text-text-secondary">Nome da Empresa</label>
-                                        <input className="w-full bg-[#0b0d11] border border-surface-border rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-600" type="text" defaultValue={selectedCompany.name}/>
+                                        <input name="name" className="w-full bg-[#0b0d11] border border-surface-border rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-600" type="text" defaultValue={selectedCompany.name}/>
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm font-medium text-text-secondary">WhatsApp Comercial</label>
                                         <div className="relative">
                                             <span className="absolute left-3 top-2.5 text-text-secondary material-symbols-outlined text-[18px]">call</span>
-                                            <input className="w-full bg-[#0b0d11] border border-surface-border rounded-xl pl-10 pr-4 py-2.5 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" type="text" defaultValue={selectedCompany.whatsapp}/>
+                                            <input name="whatsapp" className="w-full bg-[#0b0d11] border border-surface-border rounded-xl pl-10 pr-4 py-2.5 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" type="text" defaultValue={selectedCompany.whatsapp}/>
                                         </div>
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm font-medium text-text-secondary">Cidade / Estado</label>
                                         <div className="relative">
                                             <span className="absolute left-3 top-2.5 text-text-secondary material-symbols-outlined text-[18px]">location_on</span>
-                                            <input className="w-full bg-[#0b0d11] border border-surface-border rounded-xl pl-10 pr-4 py-2.5 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" type="text" defaultValue={selectedCompany.location}/>
+                                            <input name="location" className="w-full bg-[#0b0d11] border border-surface-border rounded-xl pl-10 pr-4 py-2.5 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" type="text" defaultValue={selectedCompany.location}/>
                                         </div>
                                     </div>
                                     <div className="col-span-1 md:col-span-2 space-y-1">
@@ -376,14 +521,15 @@ export const Admin: React.FC = () => {
                                 </div>
                             </div>
                             <div className="p-6 border-t border-surface-border bg-surface-dark flex justify-end gap-3">
-                                <button onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 rounded-full border border-surface-border text-white hover:bg-white/5 font-medium text-sm transition-colors">
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 rounded-full border border-surface-border text-white hover:bg-white/5 font-medium text-sm transition-colors">
                                     Cancelar
                                 </button>
-                                <button onClick={handleSave} className="px-6 py-2.5 rounded-full bg-primary hover:bg-primary-hover text-white font-bold text-sm shadow-lg shadow-primary/20 transition-all flex items-center gap-2">
+                                <button type="submit" className="px-6 py-2.5 rounded-full bg-primary hover:bg-primary-hover text-white font-bold text-sm shadow-lg shadow-primary/20 transition-all flex items-center gap-2">
                                     <span className="material-symbols-outlined text-[18px]">save</span>
                                     Salvar Alterações
                                 </button>
                             </div>
+                            </form>
                         </div>
                     </div>
                 )}

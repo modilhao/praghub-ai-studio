@@ -2,12 +2,67 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../src/lib/supabase';
 import { Company } from '../types';
+import { getCompanyInitials } from '../src/lib/utils';
 
 export const Home: React.FC = () => {
     const [companies, setCompanies] = useState<Company[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchLocation, setSearchLocation] = useState('');
     const [isPremiumOnly, setIsPremiumOnly] = useState(false);
+
+    useEffect(() => {
+        fetchCompanies();
+    }, []);
+
+    const fetchCompanies = async () => {
+        try {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('companies')
+                .select('*')
+                .eq('status', 'Aprovado')
+                .order('is_premium', { ascending: false })
+                .order('rating', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching companies:', error);
+                setCompanies([]);
+                return;
+            }
+
+            if (data) {
+                const mappedCompanies: Company[] = data.map((item) => ({
+                    id: item.slug, // Usando slug como id para URLs
+                    slug: item.slug,
+                    name: item.name,
+                    rating: item.rating || 0,
+                    reviews: item.reviews || 0,
+                    location: item.location || '',
+                    shortLocation: item.short_location || '',
+                    description: item.description,
+                    cep: item.cep,
+                    street: item.street,
+                    number: item.number,
+                    neighborhood: item.neighborhood,
+                    city: item.city,
+                    state: item.state,
+                    tags: item.tags || [],
+                    specialties: item.specialties || [],
+                    imageUrl: item.image_url,
+                    whatsapp: item.whatsapp,
+                    isPremium: item.is_premium || false,
+                    status: item.status || 'Pendente',
+                    cnpj: item.cnpj
+                }));
+                setCompanies(mappedCompanies);
+            }
+        } catch (error) {
+            console.error('Unexpected error:', error);
+            setCompanies([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const filteredCompanies = companies.filter(c => {
         const matchesLocation = searchLocation === '' ||
@@ -128,7 +183,41 @@ export const Home: React.FC = () => {
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                            {filteredCompanies.map(company => (
+                            {loading ? (
+                                // Loading skeleton
+                                Array.from({ length: 6 }).map((_, i) => (
+                                    <div key={i} className="bg-card-dark border border-card-border rounded-2xl overflow-hidden flex flex-col p-5">
+                                        <div className="flex items-start gap-4 mb-4">
+                                            <div className="w-14 h-14 rounded-full shimmer shrink-0"></div>
+                                            <div className="flex-1 space-y-2 py-1">
+                                                <div className="h-5 w-3/4 shimmer rounded"></div>
+                                                <div className="h-4 w-1/2 shimmer rounded"></div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-3 mb-5 flex-1">
+                                            <div className="h-4 w-full shimmer rounded"></div>
+                                            <div className="flex gap-2 pt-1">
+                                                <div className="h-6 w-16 shimmer rounded-md"></div>
+                                                <div className="h-6 w-16 shimmer rounded-md"></div>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 gap-3 mt-auto">
+                                            <div className="h-11 w-full shimmer rounded-xl"></div>
+                                            <div className="h-11 w-full shimmer rounded-xl"></div>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : filteredCompanies.length === 0 ? (
+                                <article className="col-span-1 md:col-span-2 lg:col-span-2 xl:col-span-3 bg-card-dark/30 border border-dashed border-card-border rounded-2xl p-8 flex flex-col items-center justify-center text-center">
+                                    <div className="w-16 h-16 rounded-full bg-card-dark flex items-center justify-center mb-4">
+                                        <span className="material-symbols-outlined text-slate-500 text-3xl">search_off</span>
+                                    </div>
+                                    <h3 className="text-white font-bold text-lg mb-1">Nenhuma empresa encontrada</h3>
+                                    <p className="text-slate-400 text-sm mb-4">Tente expandir sua busca para regiões próximas ou remova alguns filtros.</p>
+                                    <button onClick={() => { setSearchLocation(''); setIsPremiumOnly(false); }} className="text-primary hover:underline text-sm font-medium">Limpar todos os filtros</button>
+                                </article>
+                            ) : (
+                                filteredCompanies.map(company => (
                                 <div
                                     key={company.id}
                                     className={`group relative bg-card-dark border ${company.isPremium ? 'border-primary/50 shadow-xl shadow-primary/5 hover:shadow-primary/15' : 'border-card-border hover:border-slate-500 hover:shadow-lg hover:shadow-black/20'} rounded-2xl overflow-hidden flex flex-col transition-all hover:-translate-y-1`}
@@ -147,7 +236,7 @@ export const Home: React.FC = () => {
                                                 </div>
                                             ) : (
                                                 <div className="w-14 h-14 rounded-full bg-slate-800 flex items-center justify-center overflow-hidden shrink-0 border border-slate-700">
-                                                    <span className="text-xl font-bold text-slate-400">{company.initials}</span>
+                                                    <span className="text-xl font-bold text-slate-400">{getCompanyInitials(company.name)}</span>
                                                 </div>
                                             )}
                                             <div>
@@ -197,37 +286,8 @@ export const Home: React.FC = () => {
                                         </div>
                                     </div>
                                 </div>
-                            ))}
-
-                            <div className="bg-card-dark border border-card-border rounded-2xl overflow-hidden flex flex-col p-5">
-                                <div className="flex items-start gap-4 mb-4">
-                                    <div className="w-14 h-14 rounded-full shimmer shrink-0"></div>
-                                    <div className="flex-1 space-y-2 py-1">
-                                        <div className="h-5 w-3/4 shimmer rounded"></div>
-                                        <div className="h-4 w-1/2 shimmer rounded"></div>
-                                    </div>
-                                </div>
-                                <div className="space-y-3 mb-5 flex-1">
-                                    <div className="h-4 w-full shimmer rounded"></div>
-                                    <div className="flex gap-2 pt-1">
-                                        <div className="h-6 w-16 shimmer rounded-md"></div>
-                                        <div className="h-6 w-16 shimmer rounded-md"></div>
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-1 gap-3 mt-auto">
-                                    <div className="h-11 w-full shimmer rounded-xl"></div>
-                                    <div className="h-11 w-full shimmer rounded-xl"></div>
-                                </div>
-                            </div>
-
-                            <article className="col-span-1 md:col-span-2 lg:col-span-2 xl:col-span-3 bg-card-dark/30 border border-dashed border-card-border rounded-2xl p-8 flex flex-col items-center justify-center text-center">
-                                <div className="w-16 h-16 rounded-full bg-card-dark flex items-center justify-center mb-4">
-                                    <span className="material-symbols-outlined text-slate-500 text-3xl">search_off</span>
-                                </div>
-                                <h3 className="text-white font-bold text-lg mb-1">Não encontrou o que procurava?</h3>
-                                <p className="text-slate-400 text-sm mb-4">Tente expandir sua busca para regiões próximas ou remova alguns filtros.</p>
-                                <button className="text-primary hover:underline text-sm font-medium">Limpar todos os filtros</button>
-                            </article>
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>

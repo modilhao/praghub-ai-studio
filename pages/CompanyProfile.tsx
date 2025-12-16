@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { supabase } from '../src/lib/supabase';
 import { Company } from '../types';
+import { getCompanyInitials } from '../src/lib/utils';
 
 export const CompanyProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>(); // This is the slug
@@ -31,15 +32,26 @@ export const CompanyProfile: React.FC = () => {
             } else if (data) {
                 const mappedCompany: Company = {
                     id: data.slug, // Using slug as id for consistency with URL
+                    slug: data.slug,
                     name: data.name,
-                    rating: data.rating,
-                    reviews: data.reviews,
-                    location: data.location,
-                    shortLocation: data.short_location,
-                    tags: data.tags,
+                    rating: data.rating || 0,
+                    reviews: data.reviews || 0,
+                    location: data.location || '',
+                    shortLocation: data.short_location || '',
+                    description: data.description,
+                    cep: data.cep,
+                    street: data.street,
+                    number: data.number,
+                    neighborhood: data.neighborhood,
+                    city: data.city,
+                    state: data.state,
+                    tags: data.tags || [],
+                    specialties: data.specialties || [],
                     imageUrl: data.image_url,
                     whatsapp: data.whatsapp,
-                    isPremium: data.is_premium
+                    isPremium: data.is_premium || false,
+                    status: data.status || 'Pendente',
+                    cnpj: data.cnpj
                 };
                 setCompany(mappedCompany);
             } else {
@@ -108,7 +120,7 @@ export const CompanyProfile: React.FC = () => {
                                     <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-cover bg-center border-4 border-white dark:border-[#334155] shadow-lg" style={{ backgroundImage: `url('${company.imageUrl}')` }}></div>
                                 ) : (
                                     <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-slate-800 flex items-center justify-center border-4 border-white dark:border-[#334155] shadow-lg">
-                                        <span className="text-4xl font-bold text-slate-400">{company.initials}</span>
+                                        <span className="text-4xl font-bold text-slate-400">{getCompanyInitials(company.name)}</span>
                                     </div>
                                 )}
 
@@ -148,31 +160,43 @@ export const CompanyProfile: React.FC = () => {
                             </div>
                         </section>
 
-                        {/* About Section - Could be dynamic if we add description to data, using generic fallback for now */}
+                        {/* About Section */}
                         <section>
                             <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                                 <span className="material-symbols-outlined text-primary">info</span> Sobre a Empresa
                             </h2>
                             <div className="bg-white dark:bg-card-dark rounded-xl p-6 border border-gray-100 dark:border-card-border shadow-sm">
-                                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    A {company.name} atua no controle de pragas na região de {company.shortLocation}.
-                                    Comprometida com a segurança e eficiência, oferecendo serviços especializados para proteger seu ambiente.
-                                </p>
+                                {company.description ? (
+                                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{company.description}</p>
+                                ) : (
+                                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                                        A {company.name} atua no controle de pragas na região de {company.shortLocation}.
+                                        Comprometida com a segurança e eficiência, oferecendo serviços especializados para proteger seu ambiente.
+                                    </p>
+                                )}
                             </div>
                         </section>
 
                         {/* Tags Section */}
-                        {company.tags.length > 0 && (
+                        {(company.tags.length > 0 || (company.specialties && company.specialties.length > 0)) && (
                             <section>
                                 <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                                     <span className="material-symbols-outlined text-primary">pest_control</span> Especialidades
                                 </h2>
                                 <div className="flex flex-wrap gap-3">
-                                    {company.tags.map((tag, i) => (
-                                        <span key={i} className="px-4 py-2 bg-white dark:bg-card-dark border border-gray-200 dark:border-card-border rounded-full text-sm font-medium text-slate-700 dark:text-slate-200 flex items-center gap-2 hover:border-primary/50 transition-colors cursor-default hover:bg-slate-50 dark:hover:bg-slate-800">
-                                            <span className="size-2 rounded-full bg-primary"></span> {tag}
-                                        </span>
-                                    ))}
+                                    {company.specialties && company.specialties.length > 0 ? (
+                                        company.specialties.map((spec, i) => (
+                                            <span key={i} className="px-4 py-2 bg-white dark:bg-card-dark border border-gray-200 dark:border-card-border rounded-full text-sm font-medium text-slate-700 dark:text-slate-200 flex items-center gap-2 hover:border-primary/50 transition-colors cursor-default hover:bg-slate-50 dark:hover:bg-slate-800">
+                                                <span className="size-2 rounded-full bg-primary"></span> {spec}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        company.tags.map((tag, i) => (
+                                            <span key={i} className="px-4 py-2 bg-white dark:bg-card-dark border border-gray-200 dark:border-card-border rounded-full text-sm font-medium text-slate-700 dark:text-slate-200 flex items-center gap-2 hover:border-primary/50 transition-colors cursor-default hover:bg-slate-50 dark:hover:bg-slate-800">
+                                                <span className="size-2 rounded-full bg-primary"></span> {tag}
+                                            </span>
+                                        ))
+                                    )}
                                 </div>
                             </section>
                         )}

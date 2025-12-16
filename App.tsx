@@ -14,28 +14,48 @@ import { ForgotPassword } from './pages/ForgotPassword';
 import { LandingConsumer } from './pages/LandingConsumer';
 import { LandingPartner } from './pages/LandingPartner';
 import ScrollToTop from './components/ScrollToTop';
+import { AuthProvider } from './src/contexts/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { SessionNotification } from './components/SessionNotification';
 
 const App: React.FC = () => {
     return (
-        <HashRouter>
-            <ScrollToTop />
-            <Header />
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/sou-cliente" element={<LandingConsumer />} />
-                <Route path="/sou-parceiro" element={<LandingPartner />} />
-                <Route path="/company/:id" element={<CompanyProfile />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/dashboard" element={<CompanyDashboard />} />
-                <Route path="/terms" element={<Legal />} />
-                <Route path="/privacy" element={<Legal />} />
-                <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Footer />
-        </HashRouter>
+        <AuthProvider>
+            <HashRouter>
+                <ScrollToTop />
+                <SessionNotification />
+                <Header />
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/sou-cliente" element={<LandingConsumer />} />
+                    <Route path="/sou-parceiro" element={<LandingPartner />} />
+                    <Route path="/company/:id" element={<CompanyProfile />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route 
+                        path="/admin" 
+                        element={
+                            <ProtectedRoute requiredRole="admin">
+                                <Admin />
+                            </ProtectedRoute>
+                        } 
+                    />
+                    <Route 
+                        path="/dashboard" 
+                        element={
+                            <ProtectedRoute requiredRole="company">
+                                <CompanyDashboard />
+                            </ProtectedRoute>
+                        } 
+                    />
+                    <Route path="/terms" element={<Legal />} />
+                    <Route path="/privacy" element={<Legal />} />
+                    <Route path="*" element={<NotFound />} />
+                </Routes>
+                <Footer />
+            </HashRouter>
+        </AuthProvider>
     );
 };
 

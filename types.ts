@@ -1,16 +1,26 @@
 export interface Company {
   id: string;
+  slug: string;
   name: string;
   rating: number;
   reviews: number;
   location: string;
   shortLocation: string;
+  description?: string;
+  // Address Details
+  cep?: string;
+  street?: string;
+  number?: string;
+  neighborhood?: string;
+  city?: string;
+  state?: string;
+  // Services
   tags: string[];
+  specialties?: string[];
   imageUrl?: string;
-  initials?: string;
-  isPremium?: boolean;
-  status?: 'Aprovado' | 'Pendente' | 'Rejeitado';
-  whatsapp: string;
+  whatsapp?: string;
+  isPremium: boolean;
+  status: 'Pendente' | 'Aprovado' | 'Rejeitado';
   cnpj?: string;
 }
 

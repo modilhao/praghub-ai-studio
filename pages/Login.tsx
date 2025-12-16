@@ -1,13 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../src/lib/supabase';
+import { useAuth } from '../src/contexts/AuthContext';
 
 export const Login: React.FC = () => {
     const navigate = useNavigate();
+    const { user, profile, loading: authLoading } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Redirecionar se já estiver logado
+    useEffect(() => {
+        if (!authLoading && user) {
+            if (profile?.role === 'admin') {
+                navigate('/admin', { replace: true });
+            } else if (profile?.role === 'company') {
+                navigate('/dashboard', { replace: true });
+            } else {
+                navigate('/', { replace: true });
+            }
+        }
+    }, [user, profile, authLoading, navigate]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -15,15 +30,46 @@ export const Login: React.FC = () => {
         setError(null);
 
         try {
-            const { error: authError } = await supabase.auth.signInWithPassword({
+            const { data: { user }, error: authError } = await supabase.auth.signInWithPassword({
                 email,
                 password
             });
 
             if (authError) throw authError;
 
-            // Check if profile exists and has a role (optional)
-            navigate('/'); // Redirect to home or dashboard
+            if (user) {
+                // Check if profile exists and has a role
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', user.id)
+                    .single();
+
+                if (profileError) {
+                    // Fallback using metadata if profile fetch fails (e.g. trigger delay)
+                    const role = user.user_metadata?.role;
+                    if (role === 'admin') {
+                        navigate('/admin');
+                    } else if (role === 'consumer') {
+                        navigate('/');
+                    } else {
+                        navigate('/dashboard');
+                    }
+                } else if (profile) {
+                    if (profile.role === 'admin') {
+                        navigate('/admin');
+                    } else if (profile.role === 'consumer') {
+                        navigate('/');
+                    } else {
+                        navigate('/dashboard');
+                    }
+                } else {
+                    // Default fallback
+                    navigate('/dashboard');
+                }
+            } else {
+                throw new Error("Usuário não encontrado.");
+            }
         } catch (err: any) {
             setError(err.message || 'Erro ao realizar login');
         } finally {
@@ -40,6 +86,18 @@ export const Login: React.FC = () => {
             setPassword('password');
         }
     };
+
+    // Mostrar loading enquanto verifica autenticação
+    if (authLoading) {
+        return (
+            <div className="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center">
+                <div className="flex items-center gap-2 text-gray-900 dark:text-white">
+                    <span className="material-symbols-outlined animate-spin">refresh</span>
+                    <span>Carregando...</span>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-4">
