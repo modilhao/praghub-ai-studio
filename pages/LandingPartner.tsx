@@ -193,6 +193,102 @@ export const LandingPartner: React.FC = () => {
                 </div>
             </section>
 
+            {/* Licensed Companies */}
+            <section className="py-16 bg-slate-50 dark:bg-slate-900 border-t border-card-border">
+                <div className="max-w-6xl mx-auto px-4">
+                    <h2 className="text-3xl font-bold text-center text-slate-900 dark:text-white mb-12">
+                        Empresas Licenciadas PragHub
+                    </h2>
+
+                    <div className="grid md:grid-cols-2 gap-8">
+                        {/* Dedetizadora Dedemax */}
+                        <div className="bg-white dark:bg-card-dark p-6 rounded-2xl border border-card-border shadow-sm hover:shadow-md transition-shadow">
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Dedetizadora Dedemax</h3>
+                            <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
+                                Com atuação consolidada em Cerquilho (SP) e região, a Dedemax se posiciona como parceira confiável no controle de pragas urbanas, oferecendo soluções para residências, empresas, indústrias e órgãos públicos. <a href="https://dedetizadoradedemax.com.br" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">dedetizadoradedemax.com.br</a>
+                            </p>
+                            <div className="bg-primary/5 p-4 rounded-xl border border-primary/10">
+                                <h4 className="font-bold text-primary text-sm mb-2">Por que é um prestador‐referência PragHub:</h4>
+                                <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300">
+                                    <li className="flex items-start gap-2"><span className="material-symbols-outlined text-[16px] text-green-500 mt-0.5">check_circle</span> Foco claro em qualidade, tecnologia e transparência.</li>
+                                    <li className="flex items-start gap-2"><span className="material-symbols-outlined text-[16px] text-green-500 mt-0.5">check_circle</span> Carteira de clientes expressiva, incluindo escolas e órgãos públicos.</li>
+                                    <li className="flex items-start gap-2"><span className="material-symbols-outlined text-[16px] text-green-500 mt-0.5">check_circle</span> Comunicação direta e amigável.</li>
+                                </ul>
+                                <p className="mt-3 text-xs italic text-slate-500">
+                                    "A Dedemax se uniu à rede PragHub para ampliar sua visibilidade e foco no serviço, enquanto a plataforma cuida da gestão e dos chamados. Resultado: mais contratos recorrentes, menos carga administrativa."
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Detecta Dedetizadora */}
+                        <div className="bg-white dark:bg-card-dark p-6 rounded-2xl border border-card-border shadow-sm hover:shadow-md transition-shadow">
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Detecta Dedetizadora</h3>
+                            <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
+                                Localizada em Campinas (SP), a Detecta se destaca pelo modelo de atuação ampliada — unidades próprias + franquias — e pela oferta de serviços completos para residências, indústrias e comércios.
+                            </p>
+                            <div className="bg-primary/5 p-4 rounded-xl border border-primary/10">
+                                <h4 className="font-bold text-primary text-sm mb-2">Por que é um prestador‐referência PragHub:</h4>
+                                <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300">
+                                    <li className="flex items-start gap-2"><span className="material-symbols-outlined text-[16px] text-green-500 mt-0.5">check_circle</span> Estrutura robusta com monitoramento contínuo.</li>
+                                    <li className="flex items-start gap-2"><span className="material-symbols-outlined text-[16px] text-green-500 mt-0.5">check_circle</span> Modelo de rede/franquia que demonstra escala e credibilidade.</li>
+                                </ul>
+                                <p className="mt-3 text-xs italic text-slate-500">
+                                    "Com a Detecta integrando a rede PragHub, nossos clientes ganharam acesso a técnicos com escala e cobertura regional – e a Detecta ampliou seu pipeline de contratos corporativos com a robustez de nossa plataforma."
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Ártica Saúde Ambiental */}
+                        <div className="bg-white dark:bg-card-dark p-6 rounded-2xl border border-card-border shadow-sm hover:shadow-md transition-shadow">
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Ártica Saúde Ambiental</h3>
+                            <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
+                                A Ártica atua há mais de 25 anos no ramo de controle de pragas, com soluções sustentáveis, tecnologia moderna e atendimento emergencial 24h. <a href="https://articaambiental.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">articaambiental.com</a>
+                            </p>
+                            <div className="bg-primary/5 p-4 rounded-xl border border-primary/10">
+                                <h4 className="font-bold text-primary text-sm mb-2">Por que é um prestador‐referência PragHub:</h4>
+                                <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300">
+                                    <li className="flex items-start gap-2"><span className="material-symbols-outlined text-[16px] text-green-500 mt-0.5">check_circle</span> Mais de 25 anos de mercado, transmitindo confiança.</li>
+                                    <li className="flex items-start gap-2"><span className="material-symbols-outlined text-[16px] text-green-500 mt-0.5">check_circle</span> Abordagem orientada para excelência e sustentabilidade.</li>
+                                </ul>
+                                <p className="mt-3 text-xs italic text-slate-500">
+                                    "A Ártica escolheu o selo PragHub para oficializar sua qualidade e aumentar sua penetração em clientes que exigem compliance e rigidez técnica – hoje, é um dos nossos prestadores premium."
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* DEDEMAX Dedetizadora (Facilities) */}
+                        <div className="bg-white dark:bg-card-dark p-6 rounded-2xl border border-card-border shadow-sm hover:shadow-md transition-shadow">
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">DEDEMAX (Facilities)</h3>
+                            <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
+                                A DEDEMAX, com 12 anos de atividade, oferece soluções de desinsetização, desratização, limpeza de caixas d’água, sanitização e outros serviços, para empresas, indústrias e residências.
+                            </p>
+                            <div className="bg-primary/5 p-4 rounded-xl border border-primary/10">
+                                <h4 className="font-bold text-primary text-sm mb-2">Por que é um prestador‐referência PragHub:</h4>
+                                <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300">
+                                    <li className="flex items-start gap-2"><span className="material-symbols-outlined text-[16px] text-green-500 mt-0.5">check_circle</span> Transparência profunda, demonstrando seriedade com compliance.</li>
+                                    <li className="flex items-start gap-2"><span className="material-symbols-outlined text-[16px] text-green-500 mt-0.5">check_circle</span> Amplo espectro de serviços, alinhado à proposição de "facilities" do PragHub.</li>
+                                </ul>
+                                <p className="mt-3 text-xs italic text-slate-500">
+                                    "A DEDEMAX integra nossa rede e traz a oferta completa de facilities (pragas + sanitização + limpeza de reservatórios) para clientes PragHub que querem um único prestador homologado e confiável."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-12 text-center">
+                        <a
+                            href="https://wa.me/5511973241927"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all"
+                        >
+                            <span className="material-symbols-outlined">chat</span>
+                            Mais Informações no WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </section>
+
             {/* CTA Final */}
             <section className="py-20 bg-primary text-white text-center">
                 <div className="max-w-3xl mx-auto px-4">

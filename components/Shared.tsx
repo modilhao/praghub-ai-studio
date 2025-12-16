@@ -55,7 +55,7 @@ export const Footer: React.FC = () => {
                 <Link to="/" className="hover:opacity-90 transition-opacity">
                     <img src="/logo-footer.png" alt="PragHub" className="h-8 md:h-10 w-auto" />
                 </Link>
-                <p className="text-slate-500 text-sm">© 2024 PragHub. Todos os direitos reservados.</p>
+                <p className="text-slate-500 text-sm">© 2025 PragHub. Todos os direitos reservados.</p>
             </div>
         </footer>
     );
