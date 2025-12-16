@@ -1,15 +1,57 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { COMPANIES } from '../src/data/companies';
+import { supabase } from '../src/lib/supabase';
 import { Company } from '../types';
 
 export const CompanyProfile: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const { id } = useParams<{ id: string }>(); // This is the slug
+    const [company, setCompany] = useState<Company | null>(null);
+    const [loading, setLoading] = useState(true);
     const [showQuoteModal, setShowQuoteModal] = useState(false);
     const [quoteSent, setQuoteSent] = useState(false);
 
-    // Find company or use default for preview if not found (or redirect/show not found)
-    const company = COMPANIES.find(c => c.id === id);
+    useEffect(() => {
+        if (id) {
+            fetchCompany(id);
+        }
+    }, [id]);
+
+    const fetchCompany = async (slug: string) => {
+        try {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('companies')
+                .select('*')
+                .eq('slug', slug)
+                .single();
+
+            if (error) {
+                console.error('Error fetching company:', error);
+                setCompany(null); // Ensure company is null on error
+            } else if (data) {
+                const mappedCompany: Company = {
+                    id: data.slug, // Using slug as id for consistency with URL
+                    name: data.name,
+                    rating: data.rating,
+                    reviews: data.reviews,
+                    location: data.location,
+                    shortLocation: data.short_location,
+                    tags: data.tags,
+                    imageUrl: data.image_url,
+                    whatsapp: data.whatsapp,
+                    isPremium: data.is_premium
+                };
+                setCompany(mappedCompany);
+            } else {
+                setCompany(null); // No data found
+            }
+        } catch (error) {
+            console.error('Unexpected error:', error);
+            setCompany(null);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSendQuote = (e: React.FormEvent) => {
         e.preventDefault();

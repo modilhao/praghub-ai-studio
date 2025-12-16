@@ -1,17 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../src/lib/supabase';
 import { Company } from '../types';
 
-import { COMPANIES } from '../src/data/companies';
-
 export const Home: React.FC = () => {
+    const [companies, setCompanies] = useState<Company[]>([]);
+    const [loading, setLoading] = useState(true);
     const [searchLocation, setSearchLocation] = useState('');
     const [isPremiumOnly, setIsPremiumOnly] = useState(false);
 
-    const filteredCompanies = COMPANIES.filter(c => {
-        if (isPremiumOnly && !c.isPremium) return false;
-        if (searchLocation && !c.location.toLowerCase().includes(searchLocation.toLowerCase())) return false;
-        return true;
+    const filteredCompanies = companies.filter(c => {
+        const matchesLocation = searchLocation === '' ||
+            c.location.toLowerCase().includes(searchLocation.toLowerCase()) ||
+            c.shortLocation.toLowerCase().includes(searchLocation.toLowerCase());
+
+        const matchesPremium = !isPremiumOnly || c.isPremium;
+
+        return matchesLocation && matchesPremium;
     });
 
     return (
