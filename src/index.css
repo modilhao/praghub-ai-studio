@@ -1,0 +1,67 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/container-queries";
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #0078D7;
+}
+
+/* Shimmer Effect */
+.shimmer {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(to right, #1e293b 4%, #334155 25%, #1e293b 36%);
+    background-size: 1000px 100%;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+/* Checkbox Custom Styling for Chips */
+.chip-checkbox:checked+div {
+    background-color: #0078D7;
+    color: #ffffff;
+    border-color: #0078D7;
+}
+
+/* Glassmorphism */
+.glass-panel {
+    background: rgba(21, 25, 33, 0.95);
+    backdrop-filter: blur(12px);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Filled Material Icons */
+.material-symbols-outlined.filled {
+    font-variation-settings: 'FILL' 1;
+}
+
