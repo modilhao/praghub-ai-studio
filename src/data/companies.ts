@@ -4,10 +4,9 @@ import { Company } from '../../types';
 export const COMPANIES: Company[] = [
     {
         id: 'fastclean',
-        slug: 'fastclean',
         name: 'Dedetizadora FastClean',
         rating: 4.9,
-        reviews: 120,
+        reviewsCount: 120,
         location: 'São Paulo - SP',
         shortLocation: 'São Paulo',
         description: 'Especialista em controle de pragas 24 horas.',
@@ -16,14 +15,13 @@ export const COMPANIES: Company[] = [
         imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDxQNfh6NONH3f917Twrugkmt_dO_NAAfSO7x6BhssUnszCrEa9So5_jVDAJTR1mk_Mz6t29rkTb8lhkQM8RdBK8_aJKhAfI-sdUQm1SZI23xHZdhLAFWqYWYo5kZItj1dJJb6EdnvT1rflzRZy8JqWlF_uCTPaLfOh-EmCaAOAb_VJ3Yl9lRTjYRVI92sDySPCMFGVMLKamhJjkJQWFXWj7XjB_J4LBaWBw8yIjAZFALgmQRaYaIvUDRFhxsCT_Z3zp1rUhZcMMMxo',
         isPremium: true,
         whatsapp: '(11) 99999-9999',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'jardim',
-        slug: 'jardim-pragas',
         name: 'Jardim Pragas Control',
         rating: 4.7,
-        reviews: 45,
+        reviewsCount: 45,
         location: 'São Paulo - SP',
         shortLocation: 'São Paulo',
         description: 'Controle de pragas em jardins e áreas verdes.',
@@ -31,14 +29,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Jardins', 'Roedores'],
         isPremium: false,
         whatsapp: '(11) 88888-8888',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'ecocontrol',
-        slug: 'ecocontrol',
         name: 'EcoControl Soluções',
         rating: 4.5,
-        reviews: 28,
+        reviewsCount: 28,
         location: 'São Paulo - SP',
         shortLocation: 'São Paulo',
         description: 'Soluções ecológicas para sua casa.',
@@ -47,14 +44,13 @@ export const COMPANIES: Company[] = [
         imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDyedzpoBRUjnkl8gBZ8uIuuP9xdIEDJpZ4FlxBc-WPpW9nCTOoyg9hmTR2bgxvsUPPJ9bjwO91G5bB2X0mhn0unnUc6l__Fd-BOVegRh3272xHqbsqB99eW8NVp1fDfgHcJnPpdPMSZqVN3G1vpUa6kukd5rmuc0KskTuV-RwlquKTg4FIASsbkZcQxriwNva89ivtEMIEAgx2ioFI8MTemJnC4dEIyk_tdWpeLMtml3OdXBZiSTgnKsRuWdru-12JoYmcJEWcxE9n',
         isPremium: false,
         whatsapp: '(11) 77777-7777',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'cesar-rj',
-        slug: 'cesar-rj',
         name: 'César (RJ)',
         rating: 4.5,
-        reviews: 5,
+        reviewsCount: 5,
         location: 'Rio de Janeiro - RJ',
         shortLocation: 'Rio de Janeiro',
         description: 'Atendimento personalizado no RJ.',
@@ -62,14 +58,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Geral'],
         isPremium: false,
         whatsapp: '(21) 98346-2296',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'pragbot-participante',
-        slug: 'pragbot',
         name: 'Participante PragBot',
         rating: 4.0,
-        reviews: 2,
+        reviewsCount: 2,
         location: 'São Paulo - SP',
         shortLocation: 'São Paulo',
         description: 'Parceiro oficial PragBot.',
@@ -77,14 +72,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Formigas'],
         isPremium: false,
         whatsapp: '(11) 97777-1234',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'gilmax-goiania',
-        slug: 'gilmax',
         name: 'Gilmax Controle de Pragas',
         rating: 4.6,
-        reviews: 8,
+        reviewsCount: 8,
         location: 'Goiânia - GO',
         shortLocation: 'Goiânia',
         description: 'Especialista em licitações e grandes áreas.',
@@ -92,14 +86,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Grandes Áreas'],
         isPremium: false,
         whatsapp: '(62) 99852-6686',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'som-eduardo-jundiai',
-        slug: 'som-eduardo',
         name: 'Som Eduardo Controle de Pragas',
         rating: 4.5,
-        reviews: 6,
+        reviewsCount: 6,
         location: 'Jundiaí - SP',
         shortLocation: 'Jundiaí',
         description: 'Controle de cupins especializado.',
@@ -107,14 +100,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Cupins'],
         isPremium: false,
         whatsapp: '(11) 97325-1927',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'renascer-assessoria-ambiental',
-        slug: 'renascer',
         name: 'RENASCER Assessoria Ambiental',
         rating: 4.9,
-        reviews: 12,
+        reviewsCount: 12,
         location: 'Rio de Janeiro - RJ',
         shortLocation: 'Rio de Janeiro',
         description: 'Assessoria completa em saneamento.',
@@ -122,14 +114,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Sanitização'],
         isPremium: true,
         whatsapp: '(21) 96437-3920',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'union-saneamento-ambiental',
-        slug: 'union',
         name: 'UniOn Saneamento Ambiental',
         rating: 4.5,
-        reviews: 7,
+        reviewsCount: 7,
         location: 'Curitiba - PR',
         shortLocation: 'Curitiba',
         description: 'Controle integrado para indústrias.',
@@ -137,14 +128,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Industrial'],
         isPremium: false,
         whatsapp: '(41) 99988-7766',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'j-castro-eda',
-        slug: 'j-castro',
         name: 'J Castro Eda',
         rating: 4.4,
-        reviews: 5,
+        reviewsCount: 5,
         location: 'Fortaleza - CE',
         shortLocation: 'Fortaleza',
         description: 'Dedetização residencial eficiente.',
@@ -152,14 +142,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Baratas'],
         isPremium: false,
         whatsapp: '(85) 99123-4567',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'insetbraz',
-        slug: 'insetbraz',
         name: 'Insetbraz',
         rating: 4.5,
-        reviews: 9,
+        reviewsCount: 9,
         location: 'Belo Horizonte - MG',
         shortLocation: 'Belo Horizonte',
         description: 'Especialista em roedores.',
@@ -167,14 +156,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Roedores'],
         isPremium: false,
         whatsapp: '(31) 98877-6655',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'doutor-dedetizacao',
-        slug: 'doutor-dedetizacao',
         name: 'Doutor Dedetização',
         rating: 4.7,
-        reviews: 11,
+        reviewsCount: 11,
         location: 'Porto Alegre - RS',
         shortLocation: 'Porto Alegre',
         description: 'Plantão 24h para emergências.',
@@ -182,14 +170,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Emergências'],
         isPremium: true,
         whatsapp: '(51) 99911-2233',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'irmas-veneno',
-        slug: 'irmas-veneno',
         name: 'Irmas Veneno',
         rating: 4.6,
-        reviews: 10,
+        reviewsCount: 10,
         location: 'Salvador - BA',
         shortLocation: 'Salvador',
         description: 'Cuidado especial com seu jardim.',
@@ -197,14 +184,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Jardins'],
         isPremium: false,
         whatsapp: '(71) 98844-3322',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'lord-ambiental',
-        slug: 'lord-ambiental',
         name: 'Lord Ambiental',
         rating: 4.6,
-        reviews: 10,
+        reviewsCount: 10,
         location: 'Manaus - AM',
         shortLocation: 'Manaus',
         description: 'Licenciamento e controle industrial.',
@@ -212,14 +198,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Industrial'],
         isPremium: false,
         whatsapp: '(92) 99122-3344',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'atipragas-controle-de-pragas',
-        slug: 'atipragas',
         name: 'Atipragas Controle de Pragas',
         rating: 4.5,
-        reviews: 8,
+        reviewsCount: 8,
         location: 'Recife - PE',
         shortLocation: 'Recife',
         description: 'Sanitização de ambientes.',
@@ -227,14 +212,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Sanitização'],
         isPremium: false,
         whatsapp: '(81) 99655-4433',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'grupo-asca',
-        slug: 'grupo-asca',
         name: 'Grupo Asca',
         rating: 4.4,
-        reviews: 6,
+        reviewsCount: 6,
         location: 'Brasília - DF',
         shortLocation: 'Brasília',
         description: 'Atendendo governo e grandes empresas.',
@@ -242,14 +226,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Corporativo'],
         isPremium: false,
         whatsapp: '(61) 99877-6655',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'ac-controle-de-pragas',
-        slug: 'ac-controle',
         name: 'AC Controle de Pragas',
         rating: 4.5,
-        reviews: 9,
+        reviewsCount: 9,
         location: 'Campinas - SP',
         shortLocation: 'Campinas',
         description: 'Controle de cupins em Campinas.',
@@ -257,14 +240,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Cupins'],
         isPremium: false,
         whatsapp: '(19) 99123-9876',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'andre-luiz-passarelli',
-        slug: 'andre-luiz',
         name: 'Andre Luiz Passarelli',
         rating: 4.3,
-        reviews: 3,
+        reviewsCount: 3,
         location: 'Santos - SP',
         shortLocation: 'Santos',
         description: 'Dedetização no litoral.',
@@ -272,14 +254,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Geral'],
         isPremium: false,
         whatsapp: '(13) 99765-4321',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'licenciado-dedemax',
-        slug: 'dedemax',
         name: 'Licenciado Dedemax',
         rating: 4.4,
-        reviews: 4,
+        reviewsCount: 4,
         location: 'Ribeirão Preto - SP',
         shortLocation: 'Ribeirão Preto',
         description: 'Filial autorizada Dedemax.',
@@ -287,14 +268,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Geral'],
         isPremium: false,
         whatsapp: '(16) 99234-5678',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'insetsantos',
-        slug: 'insetsantos',
         name: 'Insetsantos',
         rating: 4.5,
-        reviews: 7,
+        reviewsCount: 7,
         location: 'Santos - SP',
         shortLocation: 'Santos',
         description: 'Especialista em condomínios no litoral.',
@@ -302,14 +282,13 @@ export const COMPANIES: Company[] = [
         specialties: ['Condomínios'],
         isPremium: false,
         whatsapp: '(13) 98123-4567',
-        status: 'Aprovado'
+        status: 'APPROVED'
     },
     {
         id: 'controle-pragas-rio-preto',
-        slug: 'rio-preto-pragas',
         name: 'Controle de Pragas Rio Preto',
         rating: 5.0,
-        reviews: 15,
+        reviewsCount: 15,
         location: 'São José do Rio Preto - SP',
         shortLocation: 'São José do Rio Preto',
         description: 'Atendimento especializado para clínicas.',
@@ -317,6 +296,6 @@ export const COMPANIES: Company[] = [
         specialties: ['Saúde'],
         isPremium: true,
         whatsapp: '(17) 99660-9433',
-        status: 'Aprovado'
+        status: 'APPROVED'
     }
 ];
