@@ -30,8 +30,9 @@ export const Header: React.FC = () => {
 
                     <div className="hidden md:flex items-center gap-8">
                         <nav className="flex gap-6">
+                            <Link to="/demonstracao" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Demonstração</Link>
                             <Link to="/consumidores" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Para Clientes</Link>
-                            <Link to="/parceiros" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Para Empresas</Link>
+                            <Link to="/" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Para Empresas</Link>
                         </nav>
 
                         {user ? (
@@ -72,7 +73,7 @@ export const Header: React.FC = () => {
                         ) : (
                             <div className="flex items-center gap-4">
                                 <Link to="/login" className="text-slate-300 hover:text-white text-sm font-medium">Entrar</Link>
-                                <Link to="/parceiros" className="bg-primary hover:bg-primary-hover text-white transition-all rounded-full h-9 px-5 text-sm font-bold flex items-center">
+                                <Link to="/" className="bg-primary hover:bg-primary-hover text-white transition-all rounded-full h-9 px-5 text-sm font-bold flex items-center">
                                     Sou Empresa
                                 </Link>
                             </div>
@@ -87,8 +88,9 @@ export const Header: React.FC = () => {
 
             {isMenuOpen && (
                 <div className="md:hidden bg-card-dark border-t border-card-border p-4 flex flex-col gap-4">
+                    <Link to="/demonstracao" className="text-white block font-medium">Demonstração</Link>
                     <Link to="/consumidores" className="text-white block font-medium">Para Clientes</Link>
-                    <Link to="/parceiros" className="text-white block font-medium">Para Empresas</Link>
+                    <Link to="/" className="text-white block font-medium">Para Empresas</Link>
                     {!user && <Link to="/login" className="text-white block font-medium">Entrar</Link>}
                     {user && (
                         <button onClick={handleLogout} className="text-red-400 block font-medium text-left">Sair</button>

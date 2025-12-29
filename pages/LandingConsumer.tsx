@@ -19,11 +19,11 @@ export const LandingConsumer: React.FC = () => {
                         Contratar controle de pragas não é só resolver um problema imediato. É evitar riscos operacionais, sanitários e reputacionais.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link to="/" className="bg-primary hover:bg-primary-hover text-white font-bold py-4 px-8 rounded-full shadow-lg shadow-primary/30 transition-all text-lg flex items-center justify-center gap-2">
+                        <Link to="/demonstracao" className="bg-primary hover:bg-primary-hover text-white font-bold py-4 px-8 rounded-full shadow-lg shadow-primary/30 transition-all text-lg flex items-center justify-center gap-2">
                             Encontrar uma empresa agora
                             <span className="material-symbols-outlined">arrow_forward</span>
                         </Link>
-                        <Link to="/" className="bg-card-dark border border-card-border hover:border-white text-white font-bold py-4 px-8 rounded-full transition-all text-lg flex items-center justify-center gap-2">
+                        <Link to="/demonstracao" className="bg-card-dark border border-card-border hover:border-white text-white font-bold py-4 px-8 rounded-full transition-all text-lg flex items-center justify-center gap-2">
                             Buscar por cidade e tipo de serviço
                             <span className="material-symbols-outlined">search</span>
                         </Link>
@@ -227,7 +227,7 @@ export const LandingConsumer: React.FC = () => {
                         Você não precisa criar conta para buscar. Não precisa contrato. Não precisa compromisso inicial.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link to="/" className="bg-card-dark border border-primary text-primary hover:bg-primary hover:text-white font-bold py-4 px-8 rounded-full shadow-lg transition-all text-lg flex items-center justify-center gap-2">
+                        <Link to="/demonstracao" className="bg-card-dark border border-primary text-primary hover:bg-primary hover:text-white font-bold py-4 px-8 rounded-full shadow-lg transition-all text-lg flex items-center justify-center gap-2">
                             Encontrar empresas agora
                             <span className="material-symbols-outlined">search</span>
                         </Link>

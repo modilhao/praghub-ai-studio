@@ -21,14 +21,14 @@ const App: React.FC = () => {
             <HashRouter>
                 <Header />
                 <Routes>
-                    <Route path="/" element={<Home />} />
+                    <Route path="/" element={<LandingPartner />} />
                     <Route path="/company/:id" element={<CompanyProfile />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/terms" element={<Legal />} />
                     <Route path="/privacy" element={<Legal />} />
-                    <Route path="/parceiros" element={<LandingPartner />} />
+                    <Route path="/demonstracao" element={<Home />} />
                     <Route path="/consumidores" element={<LandingConsumer />} />
 
                     {/* Protected Routes */}
