@@ -162,14 +162,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
             
             if (session) {
+                console.log('📥 Buscando profile para usuário:', session.user.id);
                 const profile = await fetchProfile(session.user.id);
                 if (profile) {
+                    console.log('✅ Profile carregado:', { id: profile.id, email: profile.email, role: profile.role });
                     setUser(profile);
+                } else {
+                    console.error('❌ Profile não encontrado após SIGNED_IN');
+                    setUser(null);
                 }
             } else {
+                console.log('🚪 Sessão encerrada');
                 setUser(null);
             }
             setIsLoading(false);
+            console.log('✅ Auth loading finalizado');
         });
 
         return () => subscription.unsubscribe();
