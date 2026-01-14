@@ -88,7 +88,6 @@ export const CompanyProfile: React.FC = () => {
                     </div>
                 </main>
             </div>
-            </>
         );
     }
 
