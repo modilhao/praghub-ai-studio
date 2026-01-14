@@ -36,18 +36,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // Criar promise e armazenar no ref
         const profilePromise = (async () => {
+            console.log('🔍 Iniciando busca de profile para:', userId);
+            
             // Tentar buscar o profile
+            console.log('📡 Executando query no Supabase...');
             let { data: profile, error } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', userId)
                 .single();
 
+            console.log('📥 Resposta do Supabase:', { 
+                hasData: !!profile, 
+                hasError: !!error,
+                errorCode: error?.code,
+                errorMessage: error?.message 
+            });
+
             // Se o profile não existe, tentar criar (fallback se o trigger falhou)
             if (error || !profile) {
-                console.warn('Profile não encontrado, tentando criar...', error);
+                console.warn('⚠️ Profile não encontrado, tentando criar...', error);
                 if (error) {
-                    console.error('Error fetching profile:', {
+                    console.error('❌ Error fetching profile:', {
                         message: error.message,
                         code: error.code,
                         details: error.details,
@@ -56,9 +66,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
                 
                 // Buscar dados do usuário autenticado
-                const { data: { user: authUser } } = await supabase.auth.getUser();
+                console.log('👤 Buscando dados do auth user...');
+                const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+                
+                if (authError) {
+                    console.error('❌ Erro ao buscar auth user:', authError);
+                }
                 
                 if (authUser) {
+                    console.log('✅ Auth user encontrado:', { id: authUser.id, email: authUser.email });
+                    console.log('💾 Tentando criar profile...');
+                    
                     // Criar profile com dados do auth user
                     const { data: newProfile, error: createError } = await supabase
                         .from('profiles')
@@ -73,8 +91,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         .single();
 
                     if (createError) {
-                        console.error('Erro ao criar profile:', createError);
+                        console.error('❌ Erro ao criar profile:', {
+                            message: createError.message,
+                            code: createError.code,
+                            details: createError.details,
+                            hint: createError.hint
+                        });
                         // Se ainda assim falhar, retornar um profile básico
+                        console.log('🔄 Retornando profile básico (fallback)');
                         return {
                             id: userId,
                             email: authUser.email || '',
@@ -84,11 +108,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             createdAt: new Date().toISOString()
                         } as User;
                     }
+                    console.log('✅ Profile criado com sucesso:', newProfile);
                     profile = newProfile;
                 } else {
-                    console.error('Não foi possível obter dados do usuário autenticado');
+                    console.error('❌ Não foi possível obter dados do usuário autenticado');
                     return null;
                 }
+            } else {
+                console.log('✅ Profile encontrado no banco:', { id: profile.id, email: profile.email, role: profile.role });
             }
 
             // Nota: A lógica de atualização de role foi movida para um trigger no banco
