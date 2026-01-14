@@ -25,38 +25,27 @@ const AuthRedirectHandler: React.FC<{ children: React.ReactNode }> = ({ children
 
     useEffect(() => {
         // Aguardar até que o auth termine de carregar
-        if (isLoading) {
-            console.log('⏳ Auth ainda carregando...');
-            return;
-        }
+        if (isLoading) return;
 
         // Se há um usuário logado
         if (user) {
             const currentPath = location.pathname;
-            console.log('👤 Usuário logado:', { id: user.id, role: user.role, email: user.email, currentPath });
             
             // Se está na rota /dashboard ou /admin, não fazer nada (já está na rota correta)
             if (currentPath === '/dashboard' || currentPath === '/admin') {
-                console.log('✅ Já está na rota correta');
                 return;
             }
             
             // Se está em /login ou /register e o usuário está logado, redirecionar
             if (currentPath === '/login' || currentPath === '/register') {
-                console.log('🔄 Redirecionando usuário logado...');
                 if (user.role === 'ADMIN') {
-                    console.log('→ Redirecionando para /admin');
                     navigate('/admin', { replace: true });
                 } else if (user.role === 'COMPANY') {
-                    console.log('→ Redirecionando para /dashboard');
                     navigate('/dashboard', { replace: true });
                 } else {
-                    console.log('→ Redirecionando para / (role:', user.role, ')');
                     navigate('/', { replace: true });
                 }
             }
-        } else {
-            console.log('❌ Nenhum usuário logado (isLoading:', isLoading, ')');
         }
     }, [user, isLoading, location.pathname, navigate]);
 

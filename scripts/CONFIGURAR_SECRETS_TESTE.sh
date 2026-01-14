@@ -17,7 +17,8 @@ echo ""
 
 # Valores já conhecidos
 PROJECT_REF="nkbcpwbgvesbkaebmkkw"
-STRIPE_SECRET_KEY="sk_test_51HCPguJULNOvBzJ4ijJLwk6kAueh30tWqrIyuWXqmcwfKLHVvbe673HNBp7ogTwVBUTIwzbV2l1QGu7PjHk9hm5500fsCCgT0h"
+# ⚠️ Configure STRIPE_SECRET_KEY via variável de ambiente ou forneça quando executar
+STRIPE_SECRET_KEY="${STRIPE_SECRET_KEY:-sk_test_...}"
 SUPABASE_URL="https://nkbcpwbgvesbkaebmkkw.supabase.co"
 APP_BASE_URL="http://localhost:3000"
 

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Company, Service } from '../types';
 import { supabase } from '../lib/supabase';
-import { mapCompanyFromDB } from '../lib/mappers';
 
 export const Home: React.FC = () => {
     const [companies, setCompanies] = useState<Company[]>([]);
@@ -44,37 +43,42 @@ export const Home: React.FC = () => {
 
             const { data, error } = await query.order('is_premium', { ascending: false });
 
-            if (error) {
-                console.error('Error fetching companies:', error);
-                console.error('Error details:', {
-                    message: error.message,
-                    code: error.code,
-                    details: error.details,
-                    hint: error.hint
-                });
-                throw error;
-            }
+            if (error) throw error;
 
             if (data) {
-                console.log(`✅ Carregadas ${data.length} empresas do banco`);
-                try {
-                    const mapped: Company[] = data.map(mapCompanyFromDB);
-                    setCompanies(mapped);
-                } catch (mappingError) {
-                    console.error('Error mapping companies:', mappingError);
-                    // Tentar mapear apenas as válidas
-                    const validCompanies: Company[] = [];
-                    data.forEach((item: any, index: number) => {
-                        try {
-                            validCompanies.push(mapCompanyFromDB(item));
-                        } catch (e) {
-                            console.error(`Erro ao mapear empresa ${index}:`, item, e);
-                        }
-                    });
-                    setCompanies(validCompanies);
-                }
-            } else {
-                console.warn('⚠️ Nenhuma empresa retornada do banco');
+                const mapped: Company[] = data.map(c => ({
+                    id: c.id,
+                    userId: c.owner_id,
+                    name: c.name,
+                    cnpj: c.cnpj,
+                    description: c.description,
+                    rating: Number(c.rating),
+                    reviewsCount: c.reviews_count,
+                    whatsapp: c.whatsapp,
+                    location: c.location,
+                    city: c.city,
+                    state: c.state,
+                    imageUrl: c.image_url,
+                    isPremium: c.is_premium,
+                    status: c.status as any,
+                    services: c.services,
+                    createdAt: c.created_at,
+                    shortLocation: c.short_location,
+                    tags: c.tags,
+                    initials: c.name.substring(0, 2).toUpperCase(),
+                    website: c.website,
+                    instagram: c.instagram,
+                    businessHours: c.business_hours,
+                    yearFounded: c.year_founded,
+                    ownerName: c.owner_name,
+                    methods: c.methods,
+                    gallery: c.gallery,
+                    certifications: c.certifications,
+                    serviceAreas: c.service_areas,
+                    specialties: c.specialties,
+                    priceRange: c.price_range
+                }));
+                setCompanies(mapped);
             }
         } catch (error) {
             console.error('Error fetching companies:', error);
@@ -258,12 +262,10 @@ export const Home: React.FC = () => {
                                                 </div>
                                             </div>
                                             <div className="space-y-3 mb-5 flex-1">
-                                                {company.location && (
-                                                    <div className="flex items-start gap-2 text-slate-300 text-sm">
-                                                        <span className={`material-symbols-outlined ${company.isPremium ? 'text-primary' : 'text-slate-500'} text-[18px] mt-0.5`}>location_on</span>
-                                                        <span className="leading-snug">{company.location}</span>
-                                                    </div>
-                                                )}
+                                                <div className="flex items-start gap-2 text-slate-300 text-sm">
+                                                    <span className={`material-symbols-outlined ${company.isPremium ? 'text-primary' : 'text-slate-500'} text-[18px] mt-0.5`}>location_on</span>
+                                                    <span className="leading-snug">{company.location}</span>
+                                                </div>
                                                 <div className="flex flex-wrap gap-2 pt-1">
                                                     {company.tags?.map(tag => (
                                                         <span key={tag} className="bg-background-dark border border-card-border text-slate-400 text-xs px-2 py-1 rounded-md">{tag}</span>
@@ -271,19 +273,17 @@ export const Home: React.FC = () => {
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-1 gap-3 mt-auto">
-                                                {company.whatsapp && (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            window.open(`https://wa.me/${company.whatsapp?.replace(/\D/g, '')}`, '_blank', 'noopener,noreferrer');
-                                                        }}
-                                                        className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-blue-500/20"
-                                                    >
-                                                        <span className="material-symbols-outlined text-[20px]">chat</span>
-                                                        Chamar no WhatsApp
-                                                    </button>
-                                                )}
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        window.open(`https://wa.me/${company.whatsapp?.replace(/\D/g, '')}`, '_blank', 'noopener,noreferrer');
+                                                    }}
+                                                    className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-blue-500/20"
+                                                >
+                                                    <span className="material-symbols-outlined text-[20px]">chat</span>
+                                                    Chamar no WhatsApp
+                                                </button>
                                                 <button 
                                                     onClick={(e) => e.stopPropagation()}
                                                     className="w-full bg-transparent border border-card-border hover:border-white text-white font-medium py-2.5 px-4 rounded-xl transition-colors"

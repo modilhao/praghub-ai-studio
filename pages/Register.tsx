@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Toast } from '../components/Toast';
-import { useToast } from '../hooks/useToast';
 
 export const Register: React.FC = () => {
-    const navigate = useNavigate();
     const { user, signUpWithEmail } = useAuth();
-    const { toast, showError, showInfo, hideToast } = useToast();
     const [submitted, setSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -21,45 +17,8 @@ export const Register: React.FC = () => {
         whatsapp: '',
     });
 
-    // Validação de dados do formulário
-    const validateFormData = (): string[] => {
-        const errors: string[] = [];
-        
-        if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            errors.push('Email inválido');
-        }
-        
-        if (!formData.password || formData.password.length < 6) {
-            errors.push('Senha deve ter pelo menos 6 caracteres');
-        }
-        
-        if (!formData.companyName || formData.companyName.length < 3) {
-            errors.push('Nome da empresa deve ter pelo menos 3 caracteres');
-        }
-        
-        if (!formData.city || formData.city.length < 2) {
-            errors.push('Cidade inválida');
-        }
-        
-        // Validar WhatsApp (remove caracteres não numéricos e verifica se tem pelo menos 10 dígitos)
-        const whatsappDigits = formData.whatsapp.replace(/\D/g, '');
-        if (!formData.whatsapp || whatsappDigits.length < 10) {
-            errors.push('WhatsApp inválido (deve ter pelo menos 10 dígitos)');
-        }
-        
-        return errors;
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
-        // Validar dados antes de enviar
-        const validationErrors = validateFormData();
-        if (validationErrors.length > 0) {
-            showError(validationErrors.join('. '));
-            return;
-        }
-        
         setIsLoading(true);
 
         try {
@@ -75,38 +34,26 @@ export const Register: React.FC = () => {
 
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) {
-                    showInfo('Conta criada! Por favor, verifique seu e-mail (se habilitado) ou tente logar.');
+                    alert('Conta criada! Por favor, verifique seu e-mail (se habilitado) ou tente logar.');
                     setIsLoading(false);
                     return;
                 }
                 currentUser = session.user as any;
             }
 
-            // Verificar se o profile foi criado pelo trigger do banco
-            // Aguardar um pouco mais para garantir que o trigger executou
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            const { data: profile, error: profileError } = await supabase
-                .from('profiles')
-                .select('id')
-                .eq('id', currentUser?.id)
-                .single();
-            
-            if (profileError || !profile) {
-                // Se o profile ainda não existe, tentar criar manualmente (fallback)
-                console.warn('Profile não encontrado após criação de usuário, tentando criar...');
-                const { error: createProfileError } = await supabase
-                    .from('profiles')
-                    .insert({
-                        id: currentUser?.id,
-                        email: formData.email,
-                        name: formData.companyName,
-                        role: 'CUSTOMER' // Será atualizado para COMPANY pelo trigger quando a empresa for criada
-                    });
-                
-                if (createProfileError) {
-                    throw new Error("Erro ao criar perfil de usuário. Tente novamente.");
+            // Retry logic para garantir que o profile existe antes de criar a empresa
+            let profileExists = false;
+            for (let i = 0; i < 3; i++) {
+                const { data: profile } = await supabase.from('profiles').select('id').eq('id', currentUser?.id).single();
+                if (profile) {
+                    profileExists = true;
+                    break;
                 }
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            if (!profileExists) {
+                throw new Error("Erro ao criar perfil de usuário. Tente novamente.");
             }
 
             // Preparar dados adicionais (arrays)
@@ -132,34 +79,33 @@ export const Register: React.FC = () => {
                 throw new Error(`Erro ao criar empresa: ${companyError.message}`);
             }
 
-            // Nota: O role será atualizado automaticamente pelo trigger do banco
-            // (scripts/EPIC_00_UPDATE_ROLE_ON_COMPANY_CREATE.sql)
+            // Atualizar o role do usuário para COMPANY
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update({ role: 'COMPANY' })
+                .eq('id', currentUser?.id);
+
+            if (profileError) {
+                console.error('Erro ao atualizar role:', profileError);
+            }
 
             setSubmitted(true);
 
-            // Redirecionar usando React Router ao invés de window.location
             setTimeout(() => {
-                navigate('/dashboard', { replace: true });
+                window.location.href = '/#/dashboard';
+                window.location.reload();
             }, 2000);
 
         } catch (error: any) {
             console.error('Erro no registro:', error);
-            showError(error.message || 'Ocorreu um erro ao salvar os dados.');
+            alert(error.message || 'Ocorreu um erro ao salvar os dados.');
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <>
-            <Toast
-                message={toast?.message || ''}
-                type={toast?.type || 'info'}
-                isVisible={!!toast}
-                onClose={hideToast}
-                duration={toast?.type === 'error' ? 6000 : 4000}
-            />
-            <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark">
+        <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark">
             <main className="flex-grow flex justify-center py-8 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12">
                     <div className="lg:col-span-5 flex flex-col justify-center gap-8 pt-4 lg:pt-12">
@@ -387,6 +333,5 @@ export const Register: React.FC = () => {
                 </div>
             </main>
         </div>
-        </>
     );
 };

@@ -10,7 +10,8 @@
 set -e
 
 # Chave de teste do Stripe
-STRIPE_SECRET_KEY="sk_test_51HCPguJULNOvBzJ4ijJLwk6kAueh30tWqrIyuWXqmcwfKLHVvbe673HNBp7ogTwVBUTIwzbV2l1QGu7PjHk9hm5500fsCCgT0h"
+# ⚠️ Configure STRIPE_SECRET_KEY via variável de ambiente
+STRIPE_SECRET_KEY="${STRIPE_SECRET_KEY:-}"
 
 # Variáveis para armazenar Product IDs criados
 PROD_DIRECTORY=""

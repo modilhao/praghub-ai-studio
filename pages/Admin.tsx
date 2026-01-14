@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Company, Lead } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { mapCompanyFromDB } from '../lib/mappers';
 import logoFooter from '../logo-footer.png';
 
 export const Admin: React.FC = () => {
@@ -41,7 +40,32 @@ export const Admin: React.FC = () => {
             if (compErr) throw compErr;
 
             if (compData) {
-                setCompanies(compData.map(mapCompanyFromDB));
+                setCompanies(compData.map(c => ({
+                    id: c.id,
+                    userId: c.owner_id,
+                    name: c.name,
+                    cnpj: c.cnpj,
+                    description: c.description,
+                    rating: Number(c.rating),
+                    reviewsCount: c.reviews_count,
+                    whatsapp: c.whatsapp,
+                    location: c.location,
+                    city: c.city,
+                    state: c.state,
+                    imageUrl: c.image_url,
+                    isPremium: c.is_premium,
+                    status: c.status as any,
+                    services: c.services,
+                    createdAt: c.created_at,
+                    shortLocation: c.short_location,
+                    initials: c.name.substring(0, 2).toUpperCase(),
+                    analytics: {
+                        profileViews: c.profile_views || 0,
+                        whatsappClicks: c.whatsapp_clicks || 0,
+                        leadsGenerated: c.leads_generated || 0,
+                        conversionRate: c.conversion_rate || 0
+                    }
+                })));
             }
 
             const { data: leadsData, error: leadsErr } = await supabase
@@ -116,7 +140,8 @@ export const Admin: React.FC = () => {
     };
 
     const filteredCompanies = companies.filter(c =>
-        c.name.toLowerCase().includes(searchTerm.toLowerCase())
+        c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.cnpj?.includes(searchTerm)
     );
 
     const stats = {
@@ -248,7 +273,7 @@ export const Admin: React.FC = () => {
                                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">search</span>
                                     <input
                                         type="text"
-                                        placeholder="Buscar por nome..."
+                                        placeholder="Buscar por nome ou CNPJ..."
                                         className="w-full bg-slate-900 border border-slate-800 rounded-2xl pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -269,7 +294,7 @@ export const Admin: React.FC = () => {
                                     <thead>
                                         <tr className="bg-white/5 border-b border-slate-800">
                                             <th className="p-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Empresa</th>
-                                            <th className="p-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Cadastro</th>
+                                            <th className="p-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">CNPJ / Cadastro</th>
                                             <th className="p-5 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Premium</th>
                                             <th className="p-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Status</th>
                                             <th className="p-5 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Ações</th>
@@ -290,7 +315,8 @@ export const Admin: React.FC = () => {
                                                     </div>
                                                 </td>
                                                 <td className="p-5">
-                                                    <p className="text-xs text-slate-300">{new Date(c.createdAt || '').toLocaleDateString('pt-BR')}</p>
+                                                    <p className="text-xs text-slate-300 font-mono">{c.cnpj}</p>
+                                                    <p className="text-[9px] text-slate-500 mt-1">{new Date(c.createdAt || '').toLocaleDateString('pt-BR')}</p>
                                                 </td>
                                                 <td className="p-5 text-center">
                                                     <button

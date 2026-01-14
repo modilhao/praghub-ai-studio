@@ -3,14 +3,10 @@ import { Link, useParams } from 'react-router-dom';
 import { Company } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { mapCompanyFromDB } from '../lib/mappers';
-import { Toast } from '../components/Toast';
-import { useToast } from '../hooks/useToast';
 
 export const CompanyProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { user } = useAuth();
-    const { toast, showError, hideToast } = useToast();
     const [company, setCompany] = useState<Company | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [showQuoteModal, setShowQuoteModal] = useState(false);
@@ -33,7 +29,38 @@ export const CompanyProfile: React.FC = () => {
                 if (error) throw error;
 
                 if (data) {
-                    setCompany(mapCompanyFromDB(data));
+                    setCompany({
+                        id: data.id,
+                        userId: data.owner_id,
+                        name: data.name,
+                        cnpj: data.cnpj,
+                        description: data.description,
+                        rating: Number(data.rating),
+                        reviewsCount: data.reviews_count,
+                        whatsapp: data.whatsapp,
+                        location: data.location,
+                        city: data.city,
+                        state: data.state,
+                        imageUrl: data.image_url,
+                        isPremium: data.is_premium,
+                        status: data.status as any,
+                        services: data.services,
+                        createdAt: data.created_at,
+                        shortLocation: data.short_location,
+                        tags: data.tags,
+                        initials: data.name.substring(0, 2).toUpperCase(),
+                        website: data.website,
+                        instagram: data.instagram,
+                        businessHours: data.business_hours,
+                        yearFounded: data.year_founded,
+                        ownerName: data.owner_name,
+                        methods: data.methods,
+                        gallery: data.gallery,
+                        certifications: data.certifications,
+                        serviceAreas: data.service_areas,
+                        specialties: data.specialties,
+                        priceRange: data.price_range
+                    });
                 }
             } catch (error) {
                 console.error('Error fetching company:', error);
@@ -73,7 +100,7 @@ export const CompanyProfile: React.FC = () => {
             }, 2000);
         } catch (err) {
             console.error('Error sending quote:', err);
-            showError('Erro ao enviar solicitação. Tente novamente.');
+            alert('Erro ao enviar solicitação. Tente novamente.');
         }
     };
 
@@ -101,16 +128,8 @@ export const CompanyProfile: React.FC = () => {
     }
 
     return (
-        <>
-            <Toast
-                message={toast?.message || ''}
-                type={toast?.type || 'error'}
-                isVisible={!!toast}
-                onClose={hideToast}
-                duration={toast?.type === 'error' ? 6000 : 4000}
-            />
-            <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark">
-                <main className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-10 py-8">
+        <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark">
+            <main className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-10 py-8">
                 {/* Breadcrumb */}
                 <nav className="flex mb-6 text-sm font-medium text-slate-500 dark:text-text-secondary">
                     <ol className="flex flex-wrap items-center gap-2">
@@ -153,12 +172,10 @@ export const CompanyProfile: React.FC = () => {
                                         <span className="text-xs font-bold text-slate-500 ml-1">({company.reviewsCount} reviews)</span>
                                     </div>
                                     <div className="w-px h-4 bg-slate-200 dark:bg-slate-700"></div>
-                                    {company.location && (
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="material-symbols-outlined text-[20px] text-primary">location_on</span>
-                                            <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{company.location}</span>
-                                        </div>
-                                    )}
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="material-symbols-outlined text-[20px] text-primary">location_on</span>
+                                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{company.location}</span>
+                                    </div>
                                 </div>
                             </div>
                         </section>
@@ -228,17 +245,15 @@ export const CompanyProfile: React.FC = () => {
                                 <p className="text-slate-500 text-sm mb-8">Converse diretamente com o técnico via WhatsApp.</p>
 
                                 <div className="space-y-4">
-                                    {company.whatsapp && (
-                                        <a
-                                            href={`https://wa.me/${company.whatsapp.replace(/\D/g, '')}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="w-full bg-primary hover:bg-primary-hover text-white font-black py-5 rounded-2xl shadow-xl shadow-primary/30 transition-all transform active:scale-95 flex items-center justify-center gap-3"
-                                        >
-                                            <span className="material-symbols-outlined text-[24px]">chat</span>
-                                            FALAR NO WHATSAPP
-                                        </a>
-                                    )}
+                                    <a
+                                        href={`https://wa.me/${company.whatsapp?.replace(/\D/g, '')}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-full bg-primary hover:bg-primary-hover text-white font-black py-5 rounded-2xl shadow-xl shadow-primary/30 transition-all transform active:scale-95 flex items-center justify-center gap-3"
+                                    >
+                                        <span className="material-symbols-outlined text-[24px]">chat</span>
+                                        FALAR NO WHATSAPP
+                                    </a>
                                     <button onClick={() => setShowQuoteModal(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold py-4 rounded-2xl transition-all border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-3">
                                         <span className="material-symbols-outlined text-[22px]">request_quote</span>
                                         PEDIR ORÇAMENTO
@@ -323,7 +338,6 @@ export const CompanyProfile: React.FC = () => {
                     </div>
                 )
             }
-            </div>
-        </>
+        </div >
     );
 };

@@ -1,23 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Toast } from '../components/Toast';
 import { useToast } from '../hooks/useToast';
+import { Toast } from '../components/Toast';
 
 export const Login: React.FC = () => {
     const navigate = useNavigate();
     const { signInWithEmail, user } = useAuth();
-    const { toast, showError, hideToast } = useToast();
+    const { showToast, hideToast, toast } = useToast();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    // Redireciona se já estiver logado
+    // Fallback: Redireciona se já estiver logado (ex: sessão existente ao abrir a página)
     useEffect(() => {
         if (user) {
-            if (user.role === 'ADMIN') navigate('/admin');
-            else if (user.role === 'COMPANY') navigate('/dashboard');
-            else navigate('/');
+            if (user.role === 'ADMIN') {
+                navigate('/admin', { replace: true });
+            } else if (user.role === 'COMPANY') {
+                navigate('/dashboard', { replace: true });
+            } else {
+                navigate('/', { replace: true });
+            }
         }
     }, [user, navigate]);
 
@@ -25,13 +29,26 @@ export const Login: React.FC = () => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            console.log('🔐 Tentando fazer login...');
-            await signInWithEmail(email, password);
-            console.log('✅ Login bem-sucedido, aguardando redirecionamento...');
-            // Redirecionamento é tratado no useEffect e no App.tsx
+            // IMPORTANTE: signInWithEmail retorna o User após carregar o profile
+            // Isso permite redirecionamento imediato sem depender apenas do useEffect
+            const loggedUser = await signInWithEmail(email, password);
+            
+            // Redireciona imediatamente após login bem-sucedido
+            // O useEffect acima serve como fallback para casos de sessão existente
+            if (loggedUser) {
+                if (loggedUser.role === 'ADMIN') {
+                    navigate('/admin', { replace: true });
+                } else if (loggedUser.role === 'COMPANY') {
+                    navigate('/dashboard', { replace: true });
+                } else {
+                    navigate('/', { replace: true });
+                }
+            }
         } catch (error: any) {
-            console.error('❌ Erro no login:', error);
-            showError(error.message || "Erro ao fazer login. Verifique suas credenciais.");
+            console.error('Erro ao fazer login:', error);
+            // Exibe mensagem de erro usando Toast ao invés de alert
+            const errorMessage = error.message || "Erro ao fazer login. Verifique suas credenciais.";
+            showToast(errorMessage, 'error');
         } finally {
             setIsLoading(false);
         }
@@ -39,15 +56,17 @@ export const Login: React.FC = () => {
 
     return (
         <>
-            <Toast
-                message={toast?.message || ''}
-                type={toast?.type || 'error'}
-                isVisible={!!toast}
-                onClose={hideToast}
-                duration={toast?.type === 'error' ? 6000 : 4000}
-            />
+            {toast.isVisible && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    isVisible={toast.isVisible}
+                    onClose={hideToast}
+                    duration={toast.type === 'error' ? 6000 : 4000}
+                />
+            )}
             <div className="bg-background-dark min-h-screen flex items-center justify-center p-4">
-                <div className="relative w-full max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-center gap-12 lg:gap-24">
+            <div className="relative w-full max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-center gap-12 lg:gap-24">
                 <div className="hidden md:flex flex-col flex-1 max-w-lg">
                     <div className="flex items-center gap-3 mb-8 text-white">
                         <span className="material-symbols-outlined !text-4xl text-primary">hub</span>

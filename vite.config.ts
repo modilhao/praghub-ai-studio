@@ -9,6 +9,12 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       host: '0.0.0.0',
+      // Desabilita cache em desenvolvimento para evitar problemas com código antigo
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
     },
     plugins: [react(), tailwindcss()],
     define: {

@@ -8,7 +8,7 @@ Configurar ambiente de teste com Stripe e validar o fluxo completo de pagamento.
 ## 🔑 Chaves e Valores
 
 ### Stripe (Modo Teste)
-- **STRIPE_SECRET_KEY:** `sk_test_51HCPguJULNOvBzJ4ijJLwk6kAueh30tWqrIyuWXqmcwfKLHVvbe673HNBp7ogTwVBUTIwzbV2l1QGu7PjHk9hm5500fsCCgT0h`
+- **STRIPE_SECRET_KEY:** `sk_test_...` (configure via variável de ambiente)
 
 ### Price IDs (já identificados via MCP)
 - **STRIPE_PRICE_DIRECTORY:** `price_1Sp9iDJULNOvBzJ4rHEy276L`
@@ -37,7 +37,7 @@ supabase link --project-ref nkbcpwbgvesbkaebmkkw
 ### Fase 3: Configurar Secrets
 ```bash
 # Stripe Secret Key (modo teste)
-supabase secrets set STRIPE_SECRET_KEY=sk_test_51HCPguJULNOvBzJ4ijJLwk6kAueh30tWqrIyuWXqmcwfKLHVvbe673HNBp7ogTwVBUTIwzbV2l1QGu7PjHk9hm5500fsCCgT0h
+supabase secrets set STRIPE_SECRET_KEY='sk_test_...' # Obtenha em https://dashboard.stripe.com/apikeys
 
 # Price IDs
 supabase secrets set STRIPE_PRICE_DIRECTORY=price_1Sp9iDJULNOvBzJ4rHEy276L

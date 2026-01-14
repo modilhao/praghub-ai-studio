@@ -1,14 +1,13 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types';
 import { supabase } from '../lib/supabase';
 
 interface AuthContextType {
     user: User | null;
     isLoading: boolean;
-    signInWithEmail: (email: string, password: string) => Promise<void>;
+    signInWithEmail: (email: string, password: string) => Promise<User | null>;
     signUpWithEmail: (email: string, password: string) => Promise<any>;
     logout: () => Promise<void>;
-    sessionEvent: 'SIGNED_IN' | 'SIGNED_OUT' | 'TOKEN_REFRESHED' | 'USER_UPDATED' | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -16,152 +15,86 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [sessionEvent, setSessionEvent] = useState<'SIGNED_IN' | 'SIGNED_OUT' | 'TOKEN_REFRESHED' | 'USER_UPDATED' | null>(null);
-    
-    // Refs para prevenir race conditions
-    const fetchProfileRef = useRef<Promise<User | null> | null>(null);
-    const currentUserIdRef = useRef<string | null>(null);
-    const isFetchingRef = useRef<boolean>(false);
 
-    const fetchProfile = async (userId: string): Promise<User | null> => {
-        // Prevenir múltiplas chamadas simultâneas para o mesmo usuário
-        if ((fetchProfileRef.current && currentUserIdRef.current === userId) || 
-            (isFetchingRef.current && currentUserIdRef.current === userId)) {
-            return fetchProfileRef.current || Promise.resolve(null);
-        }
-        
-        // Marcar como "em execução" antes de iniciar
-        isFetchingRef.current = true;
-        currentUserIdRef.current = userId;
-        
-        // Criar promise e armazenar no ref
-        const profilePromise = (async () => {
-            console.log('🔍 Iniciando busca de profile para:', userId);
+    const fetchProfile = async (userId: string) => {
+        // Tentar buscar o profile
+        let { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .single();
+
+        // Se o profile não existe, tentar criar (fallback se o trigger falhou)
+        if (error || !profile) {
+            console.warn('Profile não encontrado, tentando criar...', error);
             
-            // Tentar buscar o profile
-            console.log('📡 Executando query no Supabase...');
-            let { data: profile, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', userId)
-                .single();
+            // Buscar dados do usuário autenticado
+            const { data: { user: authUser } } = await supabase.auth.getUser();
+            
+            if (authUser) {
+                // Criar profile com dados do auth user
+                const { data: newProfile, error: createError } = await supabase
+                    .from('profiles')
+                    .insert({
+                        id: userId,
+                        email: authUser.email || '',
+                        name: authUser.user_metadata?.name || authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'Usuário',
+                        picture: authUser.user_metadata?.picture || authUser.user_metadata?.avatar_url || null,
+                        role: 'CUSTOMER'
+                    })
+                    .select()
+                    .single();
 
-            console.log('📥 Resposta do Supabase:', { 
-                hasData: !!profile, 
-                hasError: !!error,
-                errorCode: error?.code,
-                errorMessage: error?.message 
-            });
-
-            // Se o profile não existe, tentar criar (fallback se o trigger falhou)
-            if (error || !profile) {
-                console.warn('⚠️ Profile não encontrado, tentando criar...', error);
-                if (error) {
-                    console.error('❌ Error fetching profile:', {
-                        message: error.message,
-                        code: error.code,
-                        details: error.details,
-                        hint: error.hint
-                    });
+                if (createError) {
+                    console.error('Erro ao criar profile:', createError);
+                    // Se ainda assim falhar, retornar um profile básico
+                    return {
+                        id: userId,
+                        email: authUser.email || '',
+                        name: authUser.user_metadata?.name || authUser.user_metadata?.full_name || 'Usuário',
+                        picture: authUser.user_metadata?.picture || authUser.user_metadata?.avatar_url || null,
+                        role: 'CUSTOMER' as const,
+                        createdAt: new Date().toISOString()
+                    } as User;
                 }
-                
-                // Buscar dados do usuário autenticado
-                console.log('👤 Buscando dados do auth user...');
-                const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-                
-                if (authError) {
-                    console.error('❌ Erro ao buscar auth user:', authError);
-                }
-                
-                if (authUser) {
-                    console.log('✅ Auth user encontrado:', { id: authUser.id, email: authUser.email });
-                    console.log('💾 Tentando criar profile...');
-                    
-                    // Criar profile com dados do auth user
-                    const { data: newProfile, error: createError } = await supabase
-                        .from('profiles')
-                        .insert({
-                            id: userId,
-                            email: authUser.email || '',
-                            name: authUser.user_metadata?.name || authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'Usuário',
-                            picture: authUser.user_metadata?.picture || authUser.user_metadata?.avatar_url || null,
-                            role: 'CUSTOMER'
-                        })
-                        .select()
-                        .single();
-
-                    if (createError) {
-                        console.error('❌ Erro ao criar profile:', {
-                            message: createError.message,
-                            code: createError.code,
-                            details: createError.details,
-                            hint: createError.hint
-                        });
-                        // Se ainda assim falhar, retornar um profile básico
-                        console.log('🔄 Retornando profile básico (fallback)');
-                        return {
-                            id: userId,
-                            email: authUser.email || '',
-                            name: authUser.user_metadata?.name || authUser.user_metadata?.full_name || 'Usuário',
-                            picture: authUser.user_metadata?.picture || authUser.user_metadata?.avatar_url || null,
-                            role: 'CUSTOMER' as const,
-                            createdAt: new Date().toISOString()
-                        } as User;
-                    }
-                    console.log('✅ Profile criado com sucesso:', newProfile);
-                    profile = newProfile;
-                } else {
-                    console.error('❌ Não foi possível obter dados do usuário autenticado');
-                    return null;
-                }
+                profile = newProfile;
             } else {
-                console.log('✅ Profile encontrado no banco:', { id: profile.id, email: profile.email, role: profile.role });
-            }
-
-            // Nota: A lógica de atualização de role foi movida para um trigger no banco
-            // (scripts/EPIC_00_UPDATE_ROLE_ON_COMPANY_CREATE.sql)
-            // O trigger atualiza automaticamente o role para 'COMPANY' quando uma empresa é criada
-
-            // Validar que profile tem dados mínimos
-            if (!profile.id) {
-                console.error('❌ Profile sem id:', profile);
+                console.error('Não foi possível obter dados do usuário autenticado');
                 return null;
             }
+        }
 
-            const mappedUser = {
-                id: profile.id,
-                email: profile.email || '',
-                name: profile.name || 'Usuário',
-                picture: profile.picture || null,
-                role: (profile.role || 'CUSTOMER') as 'ADMIN' | 'COMPANY' | 'CUSTOMER',
-                createdAt: profile.created_at || new Date().toISOString()
-            } as User;
-            
-            console.log('✅ Profile mapeado:', { 
-                id: mappedUser.id, 
-                email: mappedUser.email, 
-                role: mappedUser.role,
-                name: mappedUser.name
-            });
-            return mappedUser;
-        })();
-        
-        // Armazenar promise no ref
-        fetchProfileRef.current = profilePromise;
-        
-        try {
-            const result = await profilePromise;
-            return result;
-        } finally {
-            // Limpar referências após conclusão
-            if (fetchProfileRef.current === profilePromise) {
-                fetchProfileRef.current = null;
-                isFetchingRef.current = false;
-                if (currentUserIdRef.current === userId) {
-                    currentUserIdRef.current = null;
+        // Self-healing: Check if user owns a company but has wrong role
+        if (profile.role !== 'COMPANY' && profile.role !== 'ADMIN') {
+            const { data: company } = await supabase
+                .from('companies')
+                .select('id')
+                .eq('owner_id', userId)
+                .maybeSingle();
+
+            if (company) {
+                // User owns a company, update their role
+                const { error: updateError } = await supabase
+                    .from('profiles')
+                    .update({ role: 'COMPANY' })
+                    .eq('id', userId);
+
+                if (updateError) {
+                    console.error('Error updating user role to COMPANY:', updateError);
                 }
+                // Force update local profile regardless of DB persistence success
+                profile.role = 'COMPANY';
             }
         }
+
+        return {
+            id: profile.id,
+            email: profile.email,
+            name: profile.name,
+            picture: profile.picture,
+            role: profile.role,
+            createdAt: profile.created_at
+        } as User;
     };
 
     useEffect(() => {
@@ -185,46 +118,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         checkSession();
 
-        // Listen for auth changes
+        // Listen for auth changes (ex: login via OAuth, logout, etc)
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-            // Log apenas para eventos importantes (não INITIAL_SESSION)
-            if (event !== 'INITIAL_SESSION') {
-                console.log('Auth state changed:', event, session?.user?.email);
-            }
-            
-            // Atualizar evento de sessão para notificações
-            if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-                setSessionEvent(event);
-                // Limpar evento após um tempo para permitir novas notificações
-                setTimeout(() => setSessionEvent(null), 100);
-            }
-            
             if (session) {
-                console.log('📥 Buscando profile para usuário:', session.user.id);
                 const profile = await fetchProfile(session.user.id);
                 if (profile) {
-                    console.log('✅ Profile carregado:', { id: profile.id, email: profile.email, role: profile.role });
                     setUser(profile);
-                } else {
-                    console.error('❌ Profile não encontrado após SIGNED_IN');
-                    setUser(null);
                 }
             } else {
-                console.log('🚪 Sessão encerrada');
                 setUser(null);
             }
             setIsLoading(false);
-            console.log('✅ Auth loading finalizado');
         });
 
         return () => subscription.unsubscribe();
     }, []);
 
-    const signInWithEmail = async (email: string, password: string) => {
+    /**
+     * IMPORTANTE: Este método retorna o User após carregar o profile.
+     * 
+     * Padrão de uso:
+     * - Sempre aguarde o retorno antes de fazer redirecionamento
+     * - O profile é carregado e o state é atualizado antes do retorno
+     * - Use o retorno para redirecionamento imediato
+     * - O useEffect também funciona como fallback para casos de sessão existente
+     * 
+     * Exemplo:
+     * ```typescript
+     * const user = await signInWithEmail(email, password);
+     * if (user) {
+     *   navigate(user.role === 'COMPANY' ? '/dashboard' : '/');
+     * }
+     * ```
+     */
+    const signInWithEmail = async (email: string, password: string): Promise<User | null> => {
         setIsLoading(true);
         try {
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) throw error;
+            
+            // CRÍTICO: Aguarda o profile ser carregado ANTES de retornar
+            // Isso garante que o redirecionamento tenha acesso ao role do usuário
+            if (data.user) {
+                const profile = await fetchProfile(data.user.id);
+                if (profile) {
+                    setUser(profile);
+                    return profile; // Retorna o profile para redirecionamento imediato
+                }
+            }
+            return null;
         } finally {
             setIsLoading(false);
         }
@@ -245,7 +187,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <AuthContext.Provider value={{ user, isLoading, signInWithEmail, signUpWithEmail, logout, sessionEvent }}>
+        <AuthContext.Provider value={{ user, isLoading, signInWithEmail, signUpWithEmail, logout }}>
             {children}
         </AuthContext.Provider>
     );

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Lead, ChatMessage, Company } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { mapCompanyFromDB } from '../lib/mappers';
 import { SubscriptionStatus } from '../components/SubscriptionStatus';
 import logoFooter from '../logo-footer.png';
 
@@ -30,20 +29,48 @@ export const CompanyDashboard: React.FC = () => {
                     .eq('owner_id', user.id)
                     .maybeSingle();
 
-                if (compErr) {
-                    console.error('Error fetching company:', compErr);
-                    console.error('Error details:', {
-                        message: compErr.message,
-                        code: compErr.code,
-                        details: compErr.details,
-                        hint: compErr.hint
-                    });
-                    throw compErr;
-                }
+                if (compErr) throw compErr;
 
                 if (comp) {
-                    console.log('✅ Empresa encontrada:', comp.name);
-                    setCompanyData(mapCompanyFromDB(comp));
+                    const mappedComp: Company = {
+                        id: comp.id,
+                        userId: comp.owner_id,
+                        name: comp.name,
+                        cnpj: comp.cnpj,
+                        description: comp.description,
+                        rating: Number(comp.rating),
+                        reviewsCount: comp.reviews_count,
+                        whatsapp: comp.whatsapp,
+                        location: comp.location,
+                        city: comp.city,
+                        state: comp.state,
+                        imageUrl: comp.image_url,
+                        isPremium: comp.is_premium,
+                        status: comp.status as any,
+                        services: comp.services,
+                        createdAt: comp.created_at,
+                        shortLocation: comp.short_location,
+                        tags: comp.tags,
+                        initials: comp.name.substring(0, 2).toUpperCase(),
+                        website: comp.website,
+                        instagram: comp.instagram,
+                        businessHours: comp.business_hours,
+                        yearFounded: comp.year_founded,
+                        ownerName: comp.owner_name,
+                        methods: comp.methods,
+                        gallery: comp.gallery,
+                        certifications: comp.certifications,
+                        serviceAreas: comp.service_areas,
+                        specialties: comp.specialties,
+                        priceRange: comp.price_range,
+                        analytics: {
+                            profileViews: comp.profile_views || 0,
+                            whatsappClicks: comp.whatsapp_clicks || 0,
+                            leadsGenerated: comp.leads_generated || 0,
+                            conversionRate: comp.conversion_rate || 0
+                        }
+                    };
+                    setCompanyData(mappedComp);
 
                     // Fetch leads
                     const { data: leadsData, error: leadsErr } = await supabase

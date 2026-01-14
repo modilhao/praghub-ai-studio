@@ -28,11 +28,12 @@ export interface Company {
   id: string;
   userId?: string;
   name: string;
+  cnpj?: string;
   description?: string; // Campo opcional de descrição
   rating: number;
   reviewsCount: number;
-  whatsapp?: string; // Opcional pois pode não estar preenchido
-  location?: string; // Opcional pois pode não estar preenchido
+  whatsapp: string;
+  location: string; // Endereço principal ou Região
   city?: string;
   state?: string;
   imageUrl?: string;
@@ -42,7 +43,7 @@ export interface Company {
   createdAt?: string;
   shortLocation?: string;
   tags?: string[]; // Tags rápidas (ex: '24h', 'Aceita Cartão')
-  initials?: string; // Iniciais geradas do nome (ex: 'DD' para 'Dedetizadora Rápida')
+  initials?: string;
 
   // Campos para melhoria de Product-Market Fit e Busca
   website?: string;
