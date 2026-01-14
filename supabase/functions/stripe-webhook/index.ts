@@ -19,11 +19,16 @@ const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // Mapeamento de Price IDs do Stripe para plan_key
-// ATUALIZADO: Price IDs de TESTE do Stripe (Janeiro 2025)
+// ATUALIZADO: Price IDs de TESTE do Stripe (Janeiro 2026)
 const PRICE_TO_PLAN_MAP: Record<string, 'directory' | 'directory_academy' | 'premium'> = {
-  'price_1SpTBFJULNOvBzJ46Hf2TCJK': 'directory',           // Diretório: R$ 149,00 (TESTE)
-  'price_1SpTBGJULNOvBzJ4ZEmSu0zk': 'directory_academy',   // Diretório + Academia: R$ 249,00 (TESTE)
-  'price_1SpTBGJULNOvBzJ4P3WdhYfN': 'premium',             // Premium: R$ 479,00 (TESTE)
+  // Price IDs de TESTE (criados em Janeiro 2026)
+  'price_1SpWODJULNOvBzJ47clC2p69': 'directory',           // Diretório: R$ 149,00 (TESTE - Atual)
+  'price_1SpWODJULNOvBzJ4uDxuhCN2': 'directory_academy',   // Diretório + Academia: R$ 249,00 (TESTE - Atual)
+  'price_1SpWOEJULNOvBzJ4YYQjYJjO': 'premium',             // Premium: R$ 479,00 (TESTE - Atual)
+  // Price IDs de teste antigos (mantidos para compatibilidade)
+  'price_1SpTBFJULNOvBzJ46Hf2TCJK': 'directory',           // Diretório: R$ 149,00 (TESTE - Antigo)
+  'price_1SpTBGJULNOvBzJ4ZEmSu0zk': 'directory_academy',   // Diretório + Academia: R$ 249,00 (TESTE - Antigo)
+  'price_1SpTBGJULNOvBzJ4P3WdhYfN': 'premium',             // Premium: R$ 479,00 (TESTE - Antigo)
   // Price IDs de produção (mantidos para compatibilidade)
   'price_1Sp9iDJULNOvBzJ4rHEy276L': 'directory',           // Diretório: R$ 149,00 (PRODUÇÃO)
   'price_1Sp9irJULNOvBzJ4peDiLsfv': 'directory_academy',   // Diretório + Academia: R$ 249,00 (PRODUÇÃO)
