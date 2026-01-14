@@ -1,0 +1,582 @@
+[
+  {
+    "id": "TC001",
+    "title": "Successful login with valid email and password",
+    "description": "Verify that a user can log in using valid email and password credentials and is redirected according to their role.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page"
+      },
+      {
+        "type": "action",
+        "description": "Input valid email and password"
+      },
+      {
+        "type": "action",
+        "description": "Click the login button"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm login is successful"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm redirection based on role: ADMIN to /admin, COMPANY to /dashboard, CUSTOMER to /"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Login failure with incorrect email or password",
+    "description": "Verify that login fails when invalid email or password is provided and proper error messages are shown.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page"
+      },
+      {
+        "type": "action",
+        "description": "Input invalid email or password"
+      },
+      {
+        "type": "action",
+        "description": "Click the login button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify login fails"
+      },
+      {
+        "type": "assertion",
+        "description": "Display appropriate error message for invalid credentials"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "User registration with valid company details",
+    "description": "Validate that a user can register as a COMPANY by completing the multi-step form with valid inputs and is redirected to the company dashboard.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the company registration page"
+      },
+      {
+        "type": "action",
+        "description": "Complete the multi-step form with valid account, company, and service detail inputs"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm successful creation of user and company profile with 'COMPANY' role"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify redirection to the company dashboard"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "User registration with invalid or missing required fields",
+    "description": "Verify that the registration form shows validation errors and prevents submission when required fields are missing or invalid.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the company registration page"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to submit the registration form with missing or invalid inputs"
+      },
+      {
+        "type": "assertion",
+        "description": "Form validation errors are displayed for each missing or invalid field"
+      },
+      {
+        "type": "assertion",
+        "description": "Registration submission is blocked"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Password recovery flow with valid email",
+    "description": "Test the password recovery process by submitting a registered email and confirm receiving recovery instructions.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the password recovery page"
+      },
+      {
+        "type": "action",
+        "description": "Enter a valid registered email address"
+      },
+      {
+        "type": "action",
+        "description": "Submit the password recovery form"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm display of success message indicating that recovery instructions have been sent"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Password recovery with unregistered email",
+    "description": "Verify that submitting an unregistered email in the password recovery form shows an appropriate error without exposing sensitive info.",
+    "category": "error handling",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the password recovery page"
+      },
+      {
+        "type": "action",
+        "description": "Enter an unregistered email address"
+      },
+      {
+        "type": "action",
+        "description": "Submit the password recovery form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an appropriate error or generic message is displayed without revealing user existence"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Subscription purchase and status synchronization",
+    "description": "Validate the complete subscription purchase flow using Stripe checkout and ensure subscription status updates correctly on the platform.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a COMPANY user"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the subscription plans page"
+      },
+      {
+        "type": "action",
+        "description": "Initiate purchase of a premium subscription plan"
+      },
+      {
+        "type": "action",
+        "description": "Complete the payment using the Stripe hosted checkout flow"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify redirect back to the platform after successful payment"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm subscription status is synchronized and updated to active premium"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify premium features become available to the subscribed company"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Subscription webhook event handling with invalid data",
+    "description": "Test system behavior when Stripe webhook sends invalid or malformed subscription event data.",
+    "category": "error handling",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Simulate sending a Stripe webhook event with invalid or malformed subscription data"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify webhook handler gracefully rejects or handles invalid data without crashing"
+      },
+      {
+        "type": "assertion",
+        "description": "System logs the error appropriately for later investigation"
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Public company directory search and filter functionality",
+    "description": "Verify users can search and filter pest control companies in the public directory by location, service type, and premium status accurately.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the home page with the company directory"
+      },
+      {
+        "type": "action",
+        "description": "Perform a search using a company name or service keyword"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the directory displays companies matching the search keyword"
+      },
+      {
+        "type": "action",
+        "description": "Apply filters for location, service type, and premium status"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify filtered results conform to selected criteria"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "View detailed public company profile",
+    "description": "Ensure that users can view detailed and accurate public profiles of pest control companies including services and verified reviews.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "From the directory, select a company to view its profile"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify profile displays company information, offered services, and verified customer reviews"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Lead request submission from public company profile",
+    "description": "Verify users can submit lead requests through a modal form on company profiles with proper validation and confirmation.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open a company profile page"
+      },
+      {
+        "type": "action",
+        "description": "Click the lead request button to open the modal form"
+      },
+      {
+        "type": "action",
+        "description": "Fill in valid lead request details and submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm lead request submission success message is shown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify lead is recorded and visible in the company's dashboard"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Lead request submission with invalid inputs",
+    "description": "Validate that the lead request modal form enforces client-side and server-side validation and shows errors for invalid submissions.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open a company profile page"
+      },
+      {
+        "type": "action",
+        "description": "Open the lead request modal form"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to submit the form with missing or improperly formatted required fields"
+      },
+      {
+        "type": "assertion",
+        "description": "Form validation errors are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Lead request submission is blocked"
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Company dashboard displays accurate profile and lead analytics",
+    "description": "Verify that a logged-in COMPANY user sees their current profile details, lead lists, and performance analytics charts with the latest data.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a COMPANY user"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the company dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify displayed profile data matches stored company information"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify leads list contains all current leads"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify analytical charts render correctly and reflect up-to-date metrics"
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Company dashboard profile editing with valid and invalid inputs",
+    "description": "Verify that companies can update their profile through the dashboard with validation enforcing correct inputs and changes persisting properly.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a COMPANY user"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the profile editing section of the company dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Modify profile fields with valid data and save"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify data updates are saved and reflected properly"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to input invalid data and save changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Profile editing form shows validation errors and prevents saving invalid data"
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Admin panel company approval workflow",
+    "description": "Ensure that ADMIN users can approve or reject newly registered companies and status changes are reflected in the system and directory.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as an ADMIN user"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the admin panel company management section"
+      },
+      {
+        "type": "action",
+        "description": "Review pending company registrations"
+      },
+      {
+        "type": "action",
+        "description": "Approve a pending company registration"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify company status updates to approved and is visible in the public directory"
+      },
+      {
+        "type": "action",
+        "description": "Reject another pending company registration"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify company status updates to rejected and is not visible in the public directory"
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "Admin panel toggle of company premium status",
+    "description": "Test that an ADMIN user can toggle the premium subscription status of a company and that the change is reflected in the directory and subscription system.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as ADMIN"
+      },
+      {
+        "type": "action",
+        "description": "Open the admin panel company management interface"
+      },
+      {
+        "type": "action",
+        "description": "Toggle the premium status flag for a company"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the company reflects the updated premium status in both admin and public directory views"
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Admin panel global leads overview access control",
+    "description": "Validate that only ADMIN users can access global lead management and viewing features, and unauthorized users are prevented.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Attempt to access the admin global leads section as an ADMIN user"
+      },
+      {
+        "type": "assertion",
+        "description": "Access is granted and leads data is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to access the same admin section as COMPANY or CUSTOMER user"
+      },
+      {
+        "type": "assertion",
+        "description": "Access is denied and user is redirected or shown an unauthorized message"
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Route protection based on user roles",
+    "description": "Verify role-based route protection blocks unauthorized access and allows access only to permitted routes according to session and role.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Attempt to navigate to /admin route as an ADMIN user"
+      },
+      {
+        "type": "assertion",
+        "description": "Access allowed"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to navigate to /admin route as a COMPANY or CUSTOMER user"
+      },
+      {
+        "type": "assertion",
+        "description": "Access denied and redirected to appropriate route"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to navigate to /dashboard as a COMPANY user"
+      },
+      {
+        "type": "assertion",
+        "description": "Access allowed"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to navigate to /dashboard as CUSTOMER or ADMIN user"
+      },
+      {
+        "type": "assertion",
+        "description": "Access denied and redirected"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to access protected routes without login"
+      },
+      {
+        "type": "assertion",
+        "description": "User is redirected to login with loading and redirect states handled"
+      }
+    ]
+  },
+  {
+    "id": "TC019",
+    "title": "User session management and expiration handling",
+    "description": "Verify user sessions are managed securely with proper expiration and that expired sessions force logout and redirect.",
+    "category": "security",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as any user"
+      },
+      {
+        "type": "action",
+        "description": "Simulate session expiration"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify user is logged out and redirected to login page"
+      },
+      {
+        "type": "assertion",
+        "description": "Session notifications are displayed appropriately"
+      }
+    ]
+  },
+  {
+    "id": "TC020",
+    "title": "UI responsiveness and accessibility compliance",
+    "description": "Test that the platform UI renders correctly on various device sizes and meets accessibility standards for navigation and color contrast.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the platform UI on desktop, tablet, and mobile screen sizes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify responsive layout adjusts correctly without layout breaking"
+      },
+      {
+        "type": "action",
+        "description": "Check keyboard navigation and screen reader accessibility on key pages (Login, Registration, Dashboard, Admin)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all interactive elements are accessible via keyboard and have ARIA attributes where necessary"
+      },
+      {
+        "type": "action",
+        "description": "Check color contrast ratios against UI/UX guidelines"
+      },
+      {
+        "type": "assertion",
+        "description": "Colors meet accessibility contrast criteria"
+      }
+    ]
+  }
+]

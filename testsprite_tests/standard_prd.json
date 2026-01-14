@@ -1,0 +1,131 @@
+{
+  "meta": {
+    "project": "PragHub Marketplace Platform",
+    "date": "2026-01-14",
+    "prepared_by": "Automated PRD Generator"
+  },
+  "product_overview": "PragHub is a SaaS marketplace platform connecting pest control companies with residential and commercial customers. It offers a comprehensive directory of approved companies, subscription management for premium features, user authentication, and administrative tools to facilitate lead generation and company profile management.",
+  "core_goals": [
+    "Validate Product-Market Fit by delivering a smooth user experience for end customers and efficient management tools for pest control companies.",
+    "Enable public discovery and comparison of pest control service providers with trusted company profiles and verified reviews.",
+    "Provide subscription-based premium features for companies to gain greater visibility and lead management capabilities.",
+    "Secure the platform with robust authentication, role-based access control, and route protection.",
+    "Create an easy onboarding and management portal for companies and an admin panel to oversee platform-wide data and approvals."
+  ],
+  "key_features": [
+    "Authentication system with email/password and Google login, including registration, password recovery, and session management via Supabase Auth.",
+    "Subscription management integrated with Stripe for handling premium plans, checkout, webhooks, and entitlement synchronization.",
+    "Public company directory with search, filters (location, service type, premium status), and detailed public company profiles.",
+    "Company dashboard for pest control businesses to manage their profile, view leads, analyze performance metrics, and update information.",
+    "Admin panel to manage companies, approve or reject registrations, toggle premium status, manage global leads, and view platform usage statistics.",
+    "Protected routes enforcing role-based access (ADMIN, COMPANY, CUSTOMER) with conditional rendering and redirects.",
+    "Reusable UI components such as headers, footers, notifications, and loading states built with React and Tailwind CSS for a cohesive design.",
+    "TypeScript definitions ensuring data consistency for Users, Companies, Services, Leads, and Subscriptions."
+  ],
+  "user_flow_summary": [
+    "User authentication flow allowing login with email/password or Google, with redirection based on role (ADMIN → /admin, COMPANY → /dashboard, CUSTOMER → /).",
+    "Company registration involves a multi-step form collecting account, company, and service details, with validation, creating user and profile entries, assigning the 'COMPANY' role, and redirecting to the company dashboard.",
+    "Consumers browse the company directory on the home page with search and filters, view detailed company profiles, and submit lead requests via a modal form.",
+    "Companies access their dashboard to monitor profile metrics, manage leads, update company information, and view analytic charts.",
+    "Admins use the admin panel to overview platform statistics, approve or reject companies, manage premium subscriptions, and review all leads globally."
+  ],
+  "validation_criteria": [
+    "Authentication must securely handle user sessions and role assignment, with proper redirects and error handling.",
+    "Subscription management must integrate with Stripe's checkout and webhook events reliably, ensuring up-to-date subscription status.",
+    "Public directories and company profiles must reflect real-time approved data respecting RLS policies, with filters and search functioning accurately.",
+    "Company dashboards must display live analytics, lead lists, and allow profile editing with data persistence and validation.",
+    "Admin panel features must correctly enforce permissions, update company statuses, manage premium flags, and present accurate summarized platform data.",
+    "Route protection must prevent unauthorized access based on user role and session state, including loading and redirect states.",
+    "Forms must have client-side and server-side validation with user feedback.",
+    "The system must adhere to defined UI/UX design guidelines including color scheme, typography, responsiveness, and accessibility standards."
+  ],
+  "code_summary": {
+    "tech_stack": [
+      "TypeScript",
+      "React 19.2.3",
+      "React Router DOM 7.10.1",
+      "Vite 6.2.0",
+      "Tailwind CSS 4.1.18",
+      "Supabase (Auth + Postgres + RLS)",
+      "Stripe (Billing / Hosted Checkout)"
+    ],
+    "features": [
+      {
+        "name": "Authentication",
+        "description": "Sistema de autenticação com Supabase Auth, incluindo login, registro, recuperação de senha e gerenciamento de sessão",
+        "files": [
+          "contexts/AuthContext.tsx",
+          "pages/Login.tsx",
+          "pages/Register.tsx",
+          "pages/ForgotPassword.tsx",
+          "lib/supabase.ts"
+        ]
+      },
+      {
+        "name": "Subscription Management",
+        "description": "Gerenciamento de assinaturas e entitlements com Stripe, incluindo checkout, webhooks e sincronização",
+        "files": [
+          "contexts/SubscriptionContext.tsx",
+          "lib/subscriptions.ts",
+          "lib/stripe-client.ts",
+          "pages/Planos.tsx",
+          "components/ProtectedFeature.tsx",
+          "components/SubscriptionStatus.tsx",
+          "supabase/functions/create-checkout/index.ts",
+          "supabase/functions/stripe-webhook/index.ts",
+          "supabase/functions/sync-subscription/index.ts"
+        ]
+      },
+      {
+        "name": "Company Directory",
+        "description": "Diretório público de empresas de controle de pragas com busca, filtros e perfis públicos",
+        "files": [
+          "pages/Home.tsx",
+          "pages/CompanyProfile.tsx",
+          "pages/LandingPartner.tsx",
+          "pages/LandingConsumer.tsx"
+        ]
+      },
+      {
+        "name": "Company Dashboard",
+        "description": "Painel administrativo para empresas gerenciarem seu perfil, leads e analytics",
+        "files": [
+          "pages/CompanyDashboard.tsx"
+        ]
+      },
+      {
+        "name": "Admin Panel",
+        "description": "Painel administrativo para gerenciar empresas, aprovar/rejeitar cadastros e visualizar estatísticas",
+        "files": [
+          "pages/Admin.tsx"
+        ]
+      },
+      {
+        "name": "Protected Routes",
+        "description": "Sistema de rotas protegidas baseado em roles (ADMIN, COMPANY, CUSTOMER) e entitlements",
+        "files": [
+          "components/ProtectedRoute.tsx",
+          "components/ProtectedFeature.tsx",
+          "App.tsx"
+        ]
+      },
+      {
+        "name": "Shared Components",
+        "description": "Componentes reutilizáveis como Header, Footer, Toast, ScrollToTop e SessionNotification",
+        "files": [
+          "components/Shared.tsx",
+          "components/Toast.tsx",
+          "components/ScrollToTop.tsx",
+          "components/SessionNotification.tsx"
+        ]
+      },
+      {
+        "name": "Type Definitions",
+        "description": "Definições TypeScript para tipos de dados como User, Company, Subscription, Plan, etc",
+        "files": [
+          "types.ts"
+        ]
+      }
+    ]
+  }
+}

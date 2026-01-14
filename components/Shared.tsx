@@ -33,6 +33,9 @@ export const Header: React.FC = () => {
                             <Link to="/demonstracao" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Demonstração</Link>
                             <Link to="/consumidores" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Para Clientes</Link>
                             <Link to="/" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Para Empresas</Link>
+                            {(user?.role === 'COMPANY' || !user) && (
+                                <Link to="/planos" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Planos</Link>
+                            )}
                         </nav>
 
                         {user ? (
@@ -57,9 +60,14 @@ export const Header: React.FC = () => {
                                             </Link>
                                         )}
                                         {user.role === 'COMPANY' && (
-                                            <Link to="/dashboard" className="flex items-center gap-3 px-4 py-2 text-sm text-slate-200 hover:bg-white/5">
-                                                <span className="material-symbols-outlined text-[18px]">dashboard</span> Dashboard
-                                            </Link>
+                                            <>
+                                                <Link to="/dashboard" className="flex items-center gap-3 px-4 py-2 text-sm text-slate-200 hover:bg-white/5">
+                                                    <span className="material-symbols-outlined text-[18px]">dashboard</span> Dashboard
+                                                </Link>
+                                                <Link to="/planos" className="flex items-center gap-3 px-4 py-2 text-sm text-slate-200 hover:bg-white/5">
+                                                    <span className="material-symbols-outlined text-[18px]">workspace_premium</span> Planos
+                                                </Link>
+                                            </>
                                         )}
                                         <button
                                             onClick={handleLogout}
@@ -91,6 +99,9 @@ export const Header: React.FC = () => {
                     <Link to="/demonstracao" className="text-white block font-medium">Demonstração</Link>
                     <Link to="/consumidores" className="text-white block font-medium">Para Clientes</Link>
                     <Link to="/" className="text-white block font-medium">Para Empresas</Link>
+                    {(user?.role === 'COMPANY' || !user) && (
+                        <Link to="/planos" className="text-white block font-medium">Planos</Link>
+                    )}
                     {!user && <Link to="/login" className="text-white block font-medium">Entrar</Link>}
                     {user && (
                         <button onClick={handleLogout} className="text-red-400 block font-medium text-left">Sair</button>

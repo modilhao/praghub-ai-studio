@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Lead, ChatMessage, Company } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { SubscriptionStatus } from '../components/SubscriptionStatus';
 import logoFooter from '../logo-footer.png';
 
 export const CompanyDashboard: React.FC = () => {
@@ -241,6 +242,8 @@ export const CompanyDashboard: React.FC = () => {
                                             </div>
                                         ))}
                                     </div>
+
+                                    <SubscriptionStatus />
 
                                     <div className="bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 p-8 rounded-3xl flex flex-col md:flex-row items-center gap-8">
                                         <div className="flex-1 text-center md:text-left">

@@ -273,17 +273,21 @@ export const Home: React.FC = () => {
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-1 gap-3 mt-auto">
-                                                <a
-                                                    href={`https://wa.me/${company.whatsapp?.replace(/\D/g, '')}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        window.open(`https://wa.me/${company.whatsapp?.replace(/\D/g, '')}`, '_blank', 'noopener,noreferrer');
+                                                    }}
                                                     className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-blue-500/20"
-                                                    onClick={(e) => e.stopPropagation()}
                                                 >
                                                     <span className="material-symbols-outlined text-[20px]">chat</span>
                                                     Chamar no WhatsApp
-                                                </a>
-                                                <button className="w-full bg-transparent border border-card-border hover:border-white text-white font-medium py-2.5 px-4 rounded-xl transition-colors">
+                                                </button>
+                                                <button 
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="w-full bg-transparent border border-card-border hover:border-white text-white font-medium py-2.5 px-4 rounded-xl transition-colors"
+                                                >
                                                     Ver perfil completo
                                                 </button>
                                             </div>

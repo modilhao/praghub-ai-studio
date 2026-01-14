@@ -2,15 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-declare global {
-    interface Window {
-        google: any;
-    }
-}
-
 export const Login: React.FC = () => {
     const navigate = useNavigate();
-    const { login, signInWithEmail, user } = useAuth();
+    const { signInWithEmail, user } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -23,34 +17,6 @@ export const Login: React.FC = () => {
             else navigate('/');
         }
     }, [user, navigate]);
-
-    useEffect(() => {
-        // Inicializa o botão do Google
-        const initializeGoogle = () => {
-            if (window.google) {
-                window.google.accounts.id.initialize({
-                    client_id: "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com", // Substituir por um ID real no futuro
-                    callback: (response: any) => {
-                        login(response.credential);
-                    },
-                });
-
-                window.google.accounts.id.renderButton(
-                    document.getElementById("googleSignInButton"),
-                    {
-                        theme: "outline",
-                        size: "large",
-                        text: "continue_with",
-                        shape: "pill"
-                    }
-                );
-            }
-        };
-
-        // Pequeno delay para garantir que o script do GIS carregou
-        const timer = setTimeout(initializeGoogle, 500);
-        return () => clearTimeout(timer);
-    }, [login]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -78,7 +44,7 @@ export const Login: React.FC = () => {
                         Conectando controle e segurança.
                     </h2>
                     <p className="text-text-secondary text-lg leading-relaxed mb-8">
-                        Gerencie sua empresa de controle de pragas ou encontre os melhores profissionais. Acesse agora com sua conta Google ou Email.
+                        Gerencie sua empresa de controle de pragas ou encontre os melhores profissionais. Acesse agora com sua conta.
                     </p>
                 </div>
 
@@ -87,18 +53,6 @@ export const Login: React.FC = () => {
                         <div className="text-center mb-8">
                             <h3 className="text-white text-2xl font-bold mb-2">Bem-vindo</h3>
                             <p className="text-text-secondary text-sm">Entre com sua conta</p>
-                        </div>
-
-                        {/* Google Sign In Container */}
-                        <div id="googleSignInButton" className="w-full mb-8"></div>
-
-                        <div className="relative my-8">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-input-border"></div>
-                            </div>
-                            <div className="relative flex justify-center text-xs">
-                                <span className="px-4 bg-card-dark text-text-secondary uppercase tracking-widest font-bold">ou use email</span>
-                            </div>
                         </div>
 
                         <form onSubmit={handleLogin} className="flex flex-col gap-5">
@@ -135,7 +89,7 @@ export const Login: React.FC = () => {
                                 disabled={isLoading}
                                 className="w-full bg-primary hover:bg-primary-hover text-white font-bold text-base h-12 rounded-full transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
                             >
-                                <span>{isLoading ? 'Entrando...' : 'Entrar com Email'}</span>
+                                <span>{isLoading ? 'Entrando...' : 'Entrar'}</span>
                             </button>
                         </form>
 

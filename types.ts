@@ -85,3 +85,63 @@ export interface ChatMessage {
   isRead: boolean;
   createdAt: string;
 }
+
+// ============================================
+// EPIC 01: Billing & Subscriptions
+// ============================================
+
+export type PlanKey = 'directory' | 'directory_academy' | 'premium';
+
+export type SubscriptionStatus = 
+  | 'active' 
+  | 'canceled' 
+  | 'past_due' 
+  | 'trialing' 
+  | 'incomplete' 
+  | 'incomplete_expired' 
+  | 'unpaid'
+  | 'paused';
+
+export interface Subscription {
+  id: string;
+  profileId: string;
+  stripeCustomerId: string;
+  stripeSubscriptionId: string;
+  planKey: PlanKey;
+  status: SubscriptionStatus;
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  cancelAtPeriodEnd: boolean;
+  canceledAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Entitlements {
+  profileId: string;
+  directoryAccess: boolean;
+  academyAccess: boolean;
+  premiumDiscounts: boolean;
+  basicSiteIncluded: boolean;
+  lastSyncedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Plan {
+  key: PlanKey;
+  name: string;
+  description: string;
+  price: number;
+  priceId: string; // Stripe Price ID
+  features: string[];
+  popular?: boolean;
+  idealFor?: string[];
+  tip?: string;
+  cta?: string;
+}
+
+export interface CheckoutSession {
+  sessionId: string;
+  url: string;
+}
