@@ -153,10 +153,12 @@ export const CompanyProfile: React.FC = () => {
                                         <span className="text-xs font-bold text-slate-500 ml-1">({company.reviewsCount} reviews)</span>
                                     </div>
                                     <div className="w-px h-4 bg-slate-200 dark:bg-slate-700"></div>
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="material-symbols-outlined text-[20px] text-primary">location_on</span>
-                                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{company.location}</span>
-                                    </div>
+                                    {company.location && (
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="material-symbols-outlined text-[20px] text-primary">location_on</span>
+                                            <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{company.location}</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </section>
@@ -226,15 +228,17 @@ export const CompanyProfile: React.FC = () => {
                                 <p className="text-slate-500 text-sm mb-8">Converse diretamente com o técnico via WhatsApp.</p>
 
                                 <div className="space-y-4">
-                                    <a
-                                        href={`https://wa.me/${company.whatsapp?.replace(/\D/g, '')}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="w-full bg-primary hover:bg-primary-hover text-white font-black py-5 rounded-2xl shadow-xl shadow-primary/30 transition-all transform active:scale-95 flex items-center justify-center gap-3"
-                                    >
-                                        <span className="material-symbols-outlined text-[24px]">chat</span>
-                                        FALAR NO WHATSAPP
-                                    </a>
+                                    {company.whatsapp && (
+                                        <a
+                                            href={`https://wa.me/${company.whatsapp.replace(/\D/g, '')}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-full bg-primary hover:bg-primary-hover text-white font-black py-5 rounded-2xl shadow-xl shadow-primary/30 transition-all transform active:scale-95 flex items-center justify-center gap-3"
+                                        >
+                                            <span className="material-symbols-outlined text-[24px]">chat</span>
+                                            FALAR NO WHATSAPP
+                                        </a>
+                                    )}
                                     <button onClick={() => setShowQuoteModal(true)} className="w-full bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold py-4 rounded-2xl transition-all border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-3">
                                         <span className="material-symbols-outlined text-[22px]">request_quote</span>
                                         PEDIR ORÇAMENTO

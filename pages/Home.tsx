@@ -258,10 +258,12 @@ export const Home: React.FC = () => {
                                                 </div>
                                             </div>
                                             <div className="space-y-3 mb-5 flex-1">
-                                                <div className="flex items-start gap-2 text-slate-300 text-sm">
-                                                    <span className={`material-symbols-outlined ${company.isPremium ? 'text-primary' : 'text-slate-500'} text-[18px] mt-0.5`}>location_on</span>
-                                                    <span className="leading-snug">{company.location}</span>
-                                                </div>
+                                                {company.location && (
+                                                    <div className="flex items-start gap-2 text-slate-300 text-sm">
+                                                        <span className={`material-symbols-outlined ${company.isPremium ? 'text-primary' : 'text-slate-500'} text-[18px] mt-0.5`}>location_on</span>
+                                                        <span className="leading-snug">{company.location}</span>
+                                                    </div>
+                                                )}
                                                 <div className="flex flex-wrap gap-2 pt-1">
                                                     {company.tags?.map(tag => (
                                                         <span key={tag} className="bg-background-dark border border-card-border text-slate-400 text-xs px-2 py-1 rounded-md">{tag}</span>
@@ -269,17 +271,19 @@ export const Home: React.FC = () => {
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-1 gap-3 mt-auto">
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        window.open(`https://wa.me/${company.whatsapp?.replace(/\D/g, '')}`, '_blank', 'noopener,noreferrer');
-                                                    }}
-                                                    className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-blue-500/20"
-                                                >
-                                                    <span className="material-symbols-outlined text-[20px]">chat</span>
-                                                    Chamar no WhatsApp
-                                                </button>
+                                                {company.whatsapp && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            window.open(`https://wa.me/${company.whatsapp?.replace(/\D/g, '')}`, '_blank', 'noopener,noreferrer');
+                                                        }}
+                                                        className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-blue-500/20"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[20px]">chat</span>
+                                                        Chamar no WhatsApp
+                                                    </button>
+                                                )}
                                                 <button 
                                                     onClick={(e) => e.stopPropagation()}
                                                     className="w-full bg-transparent border border-card-border hover:border-white text-white font-medium py-2.5 px-4 rounded-xl transition-colors"
