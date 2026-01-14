@@ -46,6 +46,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Se o profile não existe, tentar criar (fallback se o trigger falhou)
             if (error || !profile) {
                 console.warn('Profile não encontrado, tentando criar...', error);
+                if (error) {
+                    console.error('Error fetching profile:', {
+                        message: error.message,
+                        code: error.code,
+                        details: error.details,
+                        hint: error.hint
+                    });
+                }
                 
                 // Buscar dados do usuário autenticado
                 const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -87,14 +95,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // (scripts/EPIC_00_UPDATE_ROLE_ON_COMPANY_CREATE.sql)
             // O trigger atualiza automaticamente o role para 'COMPANY' quando uma empresa é criada
 
-            return {
+            const mappedUser = {
                 id: profile.id,
-                email: profile.email,
-                name: profile.name,
-                picture: profile.picture,
-                role: profile.role,
-                createdAt: profile.created_at
+                email: profile.email || '',
+                name: profile.name || 'Usuário',
+                picture: profile.picture || null,
+                role: (profile.role || 'CUSTOMER') as 'ADMIN' | 'COMPANY' | 'CUSTOMER',
+                createdAt: profile.created_at || new Date().toISOString()
             } as User;
+            
+            console.log('✅ Profile mapeado:', { id: mappedUser.id, email: mappedUser.email, role: mappedUser.role });
+            return mappedUser;
         })();
         
         // Armazenar promise no ref

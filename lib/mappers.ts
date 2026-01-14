@@ -6,24 +6,30 @@ import { getCompanyInitials } from './utils';
  * Centraliza a lógica de mapeamento para evitar repetição de código
  */
 export function mapCompanyFromDB(data: any): Company {
+  // Validar campos obrigatórios
+  if (!data.id || !data.name) {
+    console.error('Dados inválidos ao mapear Company:', data);
+    throw new Error('Dados da empresa inválidos: id ou name faltando');
+  }
+
   const companyData = {
     id: data.id,
     userId: data.owner_id,
     name: data.name,
-    description: data.description,
-    rating: Number(data.rating),
-    reviewsCount: data.reviews_count,
-    whatsapp: data.whatsapp,
-    location: data.location,
+    description: data.description || null,
+    rating: Number(data.rating || 0),
+    reviewsCount: data.reviews_count || 0,
+    whatsapp: data.whatsapp || '',
+    location: data.location || data.short_location || data.city || 'Localização não informada',
     city: data.city,
     state: data.state,
     imageUrl: data.image_url,
-    isPremium: data.is_premium,
-    status: data.status as 'PENDING' | 'APPROVED' | 'REJECTED',
-    services: data.services,
+    isPremium: data.is_premium || false,
+    status: (data.status || 'PENDING') as 'PENDING' | 'APPROVED' | 'REJECTED',
+    services: data.services || [],
     createdAt: data.created_at,
     shortLocation: data.short_location,
-    tags: data.tags,
+    tags: data.tags || [],
     website: data.website,
     instagram: data.instagram,
     businessHours: data.business_hours,

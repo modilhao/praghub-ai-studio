@@ -30,9 +30,19 @@ export const CompanyDashboard: React.FC = () => {
                     .eq('owner_id', user.id)
                     .maybeSingle();
 
-                if (compErr) throw compErr;
+                if (compErr) {
+                    console.error('Error fetching company:', compErr);
+                    console.error('Error details:', {
+                        message: compErr.message,
+                        code: compErr.code,
+                        details: compErr.details,
+                        hint: compErr.hint
+                    });
+                    throw compErr;
+                }
 
                 if (comp) {
+                    console.log('✅ Empresa encontrada:', comp.name);
                     setCompanyData(mapCompanyFromDB(comp));
 
                     // Fetch leads

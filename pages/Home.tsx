@@ -44,11 +44,37 @@ export const Home: React.FC = () => {
 
             const { data, error } = await query.order('is_premium', { ascending: false });
 
-            if (error) throw error;
+            if (error) {
+                console.error('Error fetching companies:', error);
+                console.error('Error details:', {
+                    message: error.message,
+                    code: error.code,
+                    details: error.details,
+                    hint: error.hint
+                });
+                throw error;
+            }
 
             if (data) {
-                const mapped: Company[] = data.map(mapCompanyFromDB);
-                setCompanies(mapped);
+                console.log(`✅ Carregadas ${data.length} empresas do banco`);
+                try {
+                    const mapped: Company[] = data.map(mapCompanyFromDB);
+                    setCompanies(mapped);
+                } catch (mappingError) {
+                    console.error('Error mapping companies:', mappingError);
+                    // Tentar mapear apenas as válidas
+                    const validCompanies: Company[] = [];
+                    data.forEach((item: any, index: number) => {
+                        try {
+                            validCompanies.push(mapCompanyFromDB(item));
+                        } catch (e) {
+                            console.error(`Erro ao mapear empresa ${index}:`, item, e);
+                        }
+                    });
+                    setCompanies(validCompanies);
+                }
+            } else {
+                console.warn('⚠️ Nenhuma empresa retornada do banco');
             }
         } catch (error) {
             console.error('Error fetching companies:', error);
