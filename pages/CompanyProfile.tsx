@@ -4,10 +4,13 @@ import { Company } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { mapCompanyFromDB } from '../lib/mappers';
+import { Toast } from '../components/Toast';
+import { useToast } from '../hooks/useToast';
 
 export const CompanyProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { user } = useAuth();
+    const { toast, showError, hideToast } = useToast();
     const [company, setCompany] = useState<Company | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [showQuoteModal, setShowQuoteModal] = useState(false);
@@ -70,7 +73,7 @@ export const CompanyProfile: React.FC = () => {
             }, 2000);
         } catch (err) {
             console.error('Error sending quote:', err);
-            alert('Erro ao enviar solicitação. Tente novamente.');
+            showError('Erro ao enviar solicitação. Tente novamente.');
         }
     };
 
@@ -98,8 +101,16 @@ export const CompanyProfile: React.FC = () => {
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark">
-            <main className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-10 py-8">
+        <>
+            <Toast
+                message={toast?.message || ''}
+                type={toast?.type || 'error'}
+                isVisible={!!toast}
+                onClose={hideToast}
+                duration={toast?.type === 'error' ? 6000 : 4000}
+            />
+            <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark">
+                <main className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-10 py-8">
                 {/* Breadcrumb */}
                 <nav className="flex mb-6 text-sm font-medium text-slate-500 dark:text-text-secondary">
                     <ol className="flex flex-wrap items-center gap-2">

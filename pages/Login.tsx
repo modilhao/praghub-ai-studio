@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { Toast } from '../components/Toast';
+import { useToast } from '../hooks/useToast';
 
 export const Login: React.FC = () => {
     const navigate = useNavigate();
     const { signInWithEmail, user } = useAuth();
+    const { toast, showError, hideToast } = useToast();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -26,15 +29,23 @@ export const Login: React.FC = () => {
             // Redirecionamento é tratado no useEffect
         } catch (error: any) {
             console.error(error);
-            alert(error.message || "Erro ao fazer login. Verifique suas credenciais.");
+            showError(error.message || "Erro ao fazer login. Verifique suas credenciais.");
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="bg-background-dark min-h-screen flex items-center justify-center p-4">
-            <div className="relative w-full max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-center gap-12 lg:gap-24">
+        <>
+            <Toast
+                message={toast?.message || ''}
+                type={toast?.type || 'error'}
+                isVisible={!!toast}
+                onClose={hideToast}
+                duration={toast?.type === 'error' ? 6000 : 4000}
+            />
+            <div className="bg-background-dark min-h-screen flex items-center justify-center p-4">
+                <div className="relative w-full max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-center gap-12 lg:gap-24">
                 <div className="hidden md:flex flex-col flex-1 max-w-lg">
                     <div className="flex items-center gap-3 mb-8 text-white">
                         <span className="material-symbols-outlined !text-4xl text-primary">hub</span>
@@ -103,5 +114,6 @@ export const Login: React.FC = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 };

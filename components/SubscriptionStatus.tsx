@@ -23,7 +23,8 @@ export function SubscriptionStatus() {
       await refresh();
     } catch (error) {
       console.error('Erro ao sincronizar:', error);
-      alert('Erro ao sincronizar. Verifique o console para mais detalhes.');
+      // Erro será tratado pelo componente pai via Toast
+      console.error('Erro ao sincronizar:', error);
     } finally {
       setIsSyncing(false);
     }

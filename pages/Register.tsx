@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { Toast } from '../components/Toast';
+import { useToast } from '../hooks/useToast';
 
 export const Register: React.FC = () => {
     const { user, signUpWithEmail } = useAuth();
+    const { toast, showError, showInfo, hideToast } = useToast();
     const [submitted, setSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -34,7 +37,7 @@ export const Register: React.FC = () => {
 
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) {
-                    alert('Conta criada! Por favor, verifique seu e-mail (se habilitado) ou tente logar.');
+                    showInfo('Conta criada! Por favor, verifique seu e-mail (se habilitado) ou tente logar.');
                     setIsLoading(false);
                     return;
                 }
@@ -98,14 +101,22 @@ export const Register: React.FC = () => {
 
         } catch (error: any) {
             console.error('Erro no registro:', error);
-            alert(error.message || 'Ocorreu um erro ao salvar os dados.');
+            showError(error.message || 'Ocorreu um erro ao salvar os dados.');
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark">
+        <>
+            <Toast
+                message={toast?.message || ''}
+                type={toast?.type || 'info'}
+                isVisible={!!toast}
+                onClose={hideToast}
+                duration={toast?.type === 'error' ? 6000 : 4000}
+            />
+            <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark">
             <main className="flex-grow flex justify-center py-8 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12">
                     <div className="lg:col-span-5 flex flex-col justify-center gap-8 pt-4 lg:pt-12">
@@ -333,5 +344,6 @@ export const Register: React.FC = () => {
                 </div>
             </main>
         </div>
+        </>
     );
 };
