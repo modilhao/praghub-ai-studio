@@ -33,44 +33,7 @@ export const CompanyDashboard: React.FC = () => {
                 if (compErr) throw compErr;
 
                 if (comp) {
-                    const mappedComp: Company = {
-                        id: comp.id,
-                        userId: comp.owner_id,
-                        name: comp.name,
-                        description: comp.description,
-                        rating: Number(comp.rating),
-                        reviewsCount: comp.reviews_count,
-                        whatsapp: comp.whatsapp,
-                        location: comp.location,
-                        city: comp.city,
-                        state: comp.state,
-                        imageUrl: comp.image_url,
-                        isPremium: comp.is_premium,
-                        status: comp.status as any,
-                        services: comp.services,
-                        createdAt: comp.created_at,
-                        shortLocation: comp.short_location,
-                        tags: comp.tags,
-                        initials: comp.name.substring(0, 2).toUpperCase(),
-                        website: comp.website,
-                        instagram: comp.instagram,
-                        businessHours: comp.business_hours,
-                        yearFounded: comp.year_founded,
-                        ownerName: comp.owner_name,
-                        methods: comp.methods,
-                        gallery: comp.gallery,
-                        certifications: comp.certifications,
-                        serviceAreas: comp.service_areas,
-                        specialties: comp.specialties,
-                        priceRange: comp.price_range,
-                        analytics: {
-                            profileViews: comp.profile_views || 0,
-                            whatsappClicks: comp.whatsapp_clicks || 0,
-                            leadsGenerated: comp.leads_generated || 0,
-                            conversionRate: comp.conversion_rate || 0
-                        }
-                    };
-                    setCompanyData(mappedComp);
+                    setCompanyData(mapCompanyFromDB(comp));
 
                     // Fetch leads
                     const { data: leadsData, error: leadsErr } = await supabase
