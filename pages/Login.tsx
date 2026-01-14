@@ -25,10 +25,12 @@ export const Login: React.FC = () => {
         e.preventDefault();
         setIsLoading(true);
         try {
+            console.log('🔐 Tentando fazer login...');
             await signInWithEmail(email, password);
-            // Redirecionamento é tratado no useEffect
+            console.log('✅ Login bem-sucedido, aguardando redirecionamento...');
+            // Redirecionamento é tratado no useEffect e no App.tsx
         } catch (error: any) {
-            console.error(error);
+            console.error('❌ Erro no login:', error);
             showError(error.message || "Erro ao fazer login. Verifique suas credenciais.");
         } finally {
             setIsLoading(false);

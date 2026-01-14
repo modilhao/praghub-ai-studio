@@ -95,6 +95,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // (scripts/EPIC_00_UPDATE_ROLE_ON_COMPANY_CREATE.sql)
             // O trigger atualiza automaticamente o role para 'COMPANY' quando uma empresa é criada
 
+            // Validar que profile tem dados mínimos
+            if (!profile.id) {
+                console.error('❌ Profile sem id:', profile);
+                return null;
+            }
+
             const mappedUser = {
                 id: profile.id,
                 email: profile.email || '',
@@ -104,7 +110,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 createdAt: profile.created_at || new Date().toISOString()
             } as User;
             
-            console.log('✅ Profile mapeado:', { id: mappedUser.id, email: mappedUser.email, role: mappedUser.role });
+            console.log('✅ Profile mapeado:', { 
+                id: mappedUser.id, 
+                email: mappedUser.email, 
+                role: mappedUser.role,
+                name: mappedUser.name
+            });
             return mappedUser;
         })();
         
