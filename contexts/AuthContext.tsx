@@ -83,28 +83,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
             }
 
-            // Self-healing: Check if user owns a company but has wrong role
-            if (profile.role !== 'COMPANY' && profile.role !== 'ADMIN') {
-                const { data: company } = await supabase
-                    .from('companies')
-                    .select('id')
-                    .eq('owner_id', userId)
-                    .maybeSingle();
-
-                if (company) {
-                    // User owns a company, update their role
-                    const { error: updateError } = await supabase
-                        .from('profiles')
-                        .update({ role: 'COMPANY' })
-                        .eq('id', userId);
-
-                    if (updateError) {
-                        console.error('Error updating user role to COMPANY:', updateError);
-                    }
-                    // Force update local profile regardless of DB persistence success
-                    profile.role = 'COMPANY';
-                }
-            }
+            // Nota: A lógica de atualização de role foi movida para um trigger no banco
+            // (scripts/EPIC_00_UPDATE_ROLE_ON_COMPANY_CREATE.sql)
+            // O trigger atualiza automaticamente o role para 'COMPANY' quando uma empresa é criada
 
             return {
                 id: profile.id,

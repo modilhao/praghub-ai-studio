@@ -1,11 +1,12 @@
 import type { Company } from '../types';
+import { getCompanyInitials } from './utils';
 
 /**
  * Mapeia dados do banco de dados (snake_case) para o tipo Company (camelCase)
  * Centraliza a lógica de mapeamento para evitar repetição de código
  */
 export function mapCompanyFromDB(data: any): Company {
-  return {
+  const companyData = {
     id: data.id,
     userId: data.owner_id,
     name: data.name,
@@ -23,7 +24,6 @@ export function mapCompanyFromDB(data: any): Company {
     createdAt: data.created_at,
     shortLocation: data.short_location,
     tags: data.tags,
-    initials: data.name?.substring(0, 2).toUpperCase(),
     website: data.website,
     instagram: data.instagram,
     businessHours: data.business_hours,
@@ -43,5 +43,11 @@ export function mapCompanyFromDB(data: any): Company {
           conversionRate: data.conversion_rate || 0,
         }
       : undefined,
+  };
+  
+  // Gerar initials usando a função helper
+  return {
+    ...companyData,
+    initials: getCompanyInitials(companyData),
   };
 }

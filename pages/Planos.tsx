@@ -8,13 +8,14 @@ import type { Plan } from '../types';
 
 // ATUALIZADO: Preços correspondem aos Price IDs reais do Stripe (Janeiro 2025)
 // Nota: Se quiser alterar os preços, crie novos Prices no Stripe e atualize os Price IDs
+// Price IDs podem ser configurados via variáveis de ambiente
 const PLANS: Plan[] = [
   {
     key: 'directory',
     name: 'Diretório',
     description: 'Para empresas que querem aparecer e começar a gerar oportunidades',
-    price: 149.00, // Corresponde a price_1SpTBFJULNOvBzJ46Hf2TCJK (TESTE)
-    priceId: 'price_1SpTBFJULNOvBzJ46Hf2TCJK',
+    price: 149.00,
+    priceId: import.meta.env.VITE_STRIPE_PRICE_DIRECTORY || 'price_1SpTBFJULNOvBzJ46Hf2TCJK',
     idealFor: [
       'Quer ser encontrado por clientes na sua região',
       'Precisa de uma presença digital profissional sem complicação',
@@ -34,8 +35,8 @@ const PLANS: Plan[] = [
     key: 'directory_academy',
     name: 'Diretório + Academia',
     description: 'Para empresas que querem crescer com conhecimento e estratégia',
-    price: 249.00, // Corresponde a price_1SpTBGJULNOvBzJ4ZEmSu0zk (TESTE)
-    priceId: 'price_1SpTBGJULNOvBzJ4ZEmSu0zk',
+    price: 249.00,
+    priceId: import.meta.env.VITE_STRIPE_PRICE_DIRECTORY_ACADEMY || 'price_1SpTBGJULNOvBzJ4ZEmSu0zk',
     idealFor: [
       'Já entende a importância da visibilidade',
       'Quer se diferenciar da concorrência',
@@ -55,8 +56,8 @@ const PLANS: Plan[] = [
     key: 'premium',
     name: 'Premium',
     description: 'Para empresas que querem estrutura, autoridade e crescimento acelerado',
-    price: 479.00, // Corresponde a price_1SpTBGJULNOvBzJ4P3WdhYfN (TESTE)
-    priceId: 'price_1SpTBGJULNOvBzJ4P3WdhYfN',
+    price: 479.00,
+    priceId: import.meta.env.VITE_STRIPE_PRICE_PREMIUM || 'price_1SpTBGJULNOvBzJ4P3WdhYfN',
     popular: true,
     idealFor: [
       'Quer se posicionar como referência no mercado',

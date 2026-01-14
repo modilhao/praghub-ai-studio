@@ -42,7 +42,7 @@ export interface Company {
   createdAt?: string;
   shortLocation?: string;
   tags?: string[]; // Tags rápidas (ex: '24h', 'Aceita Cartão')
-  initials?: string;
+  initials?: string; // Iniciais geradas do nome (ex: 'DD' para 'Dedetizadora Rápida')
 
   // Campos para melhoria de Product-Market Fit e Busca
   website?: string;
