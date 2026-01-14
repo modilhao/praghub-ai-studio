@@ -76,6 +76,9 @@ npm install
 
 	•	VITE_SUPABASE_URL=...
 	•	VITE_SUPABASE_ANON_KEY=...
+	•	VITE_STRIPE_PRICE_DIRECTORY=... (opcional, padrão: price_1SpTBFJULNOvBzJ46Hf2TCJK)
+	•	VITE_STRIPE_PRICE_DIRECTORY_ACADEMY=... (opcional, padrão: price_1SpTBGJULNOvBzJ4ZEmSu0zk)
+	•	VITE_STRIPE_PRICE_PREMIUM=... (opcional, padrão: price_1SpTBGJULNOvBzJ4P3WdhYfN)
 
 3. Rodar:
 npm run dev
