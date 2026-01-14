@@ -31,8 +31,8 @@ export interface Company {
   description?: string; // Campo opcional de descrição
   rating: number;
   reviewsCount: number;
-  whatsapp: string;
-  location: string; // Endereço principal ou Região
+  whatsapp?: string; // Opcional pois pode não estar preenchido
+  location?: string; // Opcional pois pode não estar preenchido
   city?: string;
   state?: string;
   imageUrl?: string;
