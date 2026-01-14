@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Lead, ChatMessage, Company } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { mapCompanyFromDB } from '../lib/mappers';
 import { SubscriptionStatus } from '../components/SubscriptionStatus';
 import logoFooter from '../logo-footer.png';
 

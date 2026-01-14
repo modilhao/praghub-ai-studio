@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Company } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { mapCompanyFromDB } from '../lib/mappers';
 
 export const CompanyProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -29,37 +30,7 @@ export const CompanyProfile: React.FC = () => {
                 if (error) throw error;
 
                 if (data) {
-                    setCompany({
-                        id: data.id,
-                        userId: data.owner_id,
-                        name: data.name,
-                        description: data.description,
-                        rating: Number(data.rating),
-                        reviewsCount: data.reviews_count,
-                        whatsapp: data.whatsapp,
-                        location: data.location,
-                        city: data.city,
-                        state: data.state,
-                        imageUrl: data.image_url,
-                        isPremium: data.is_premium,
-                        status: data.status as any,
-                        services: data.services,
-                        createdAt: data.created_at,
-                        shortLocation: data.short_location,
-                        tags: data.tags,
-                        initials: data.name.substring(0, 2).toUpperCase(),
-                        website: data.website,
-                        instagram: data.instagram,
-                        businessHours: data.business_hours,
-                        yearFounded: data.year_founded,
-                        ownerName: data.owner_name,
-                        methods: data.methods,
-                        gallery: data.gallery,
-                        certifications: data.certifications,
-                        serviceAreas: data.service_areas,
-                        specialties: data.specialties,
-                        priceRange: data.price_range
-                    });
+                    setCompany(mapCompanyFromDB(data));
                 }
             } catch (error) {
                 console.error('Error fetching company:', error);

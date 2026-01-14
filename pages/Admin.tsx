@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Company, Lead } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { mapCompanyFromDB } from '../lib/mappers';
 import logoFooter from '../logo-footer.png';
 
 export const Admin: React.FC = () => {
@@ -40,31 +41,7 @@ export const Admin: React.FC = () => {
             if (compErr) throw compErr;
 
             if (compData) {
-                setCompanies(compData.map(c => ({
-                    id: c.id,
-                    userId: c.owner_id,
-                    name: c.name,
-                    description: c.description,
-                    rating: Number(c.rating),
-                    reviewsCount: c.reviews_count,
-                    whatsapp: c.whatsapp,
-                    location: c.location,
-                    city: c.city,
-                    state: c.state,
-                    imageUrl: c.image_url,
-                    isPremium: c.is_premium,
-                    status: c.status as any,
-                    services: c.services,
-                    createdAt: c.created_at,
-                    shortLocation: c.short_location,
-                    initials: c.name.substring(0, 2).toUpperCase(),
-                    analytics: {
-                        profileViews: c.profile_views || 0,
-                        whatsappClicks: c.whatsapp_clicks || 0,
-                        leadsGenerated: c.leads_generated || 0,
-                        conversionRate: c.conversion_rate || 0
-                    }
-                })));
+                setCompanies(compData.map(mapCompanyFromDB));
             }
 
             const { data: leadsData, error: leadsErr } = await supabase

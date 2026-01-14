@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Company, Service } from '../types';
 import { supabase } from '../lib/supabase';
+import { mapCompanyFromDB } from '../lib/mappers';
 
 export const Home: React.FC = () => {
     const [companies, setCompanies] = useState<Company[]>([]);
@@ -46,37 +47,7 @@ export const Home: React.FC = () => {
             if (error) throw error;
 
             if (data) {
-                const mapped: Company[] = data.map(c => ({
-                    id: c.id,
-                    userId: c.owner_id,
-                    name: c.name,
-                    description: c.description,
-                    rating: Number(c.rating),
-                    reviewsCount: c.reviews_count,
-                    whatsapp: c.whatsapp,
-                    location: c.location,
-                    city: c.city,
-                    state: c.state,
-                    imageUrl: c.image_url,
-                    isPremium: c.is_premium,
-                    status: c.status as any,
-                    services: c.services,
-                    createdAt: c.created_at,
-                    shortLocation: c.short_location,
-                    tags: c.tags,
-                    initials: c.name.substring(0, 2).toUpperCase(),
-                    website: c.website,
-                    instagram: c.instagram,
-                    businessHours: c.business_hours,
-                    yearFounded: c.year_founded,
-                    ownerName: c.owner_name,
-                    methods: c.methods,
-                    gallery: c.gallery,
-                    certifications: c.certifications,
-                    serviceAreas: c.service_areas,
-                    specialties: c.specialties,
-                    priceRange: c.price_range
-                }));
+                const mapped: Company[] = data.map(mapCompanyFromDB);
                 setCompanies(mapped);
             }
         } catch (error) {
