@@ -36,7 +36,6 @@ export const CompanyDashboard: React.FC = () => {
                         id: comp.id,
                         userId: comp.owner_id,
                         name: comp.name,
-                        cnpj: comp.cnpj,
                         description: comp.description,
                         rating: Number(comp.rating),
                         reviewsCount: comp.reviews_count,

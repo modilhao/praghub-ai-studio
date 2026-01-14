@@ -50,7 +50,6 @@ export const Home: React.FC = () => {
                     id: c.id,
                     userId: c.owner_id,
                     name: c.name,
-                    cnpj: c.cnpj,
                     description: c.description,
                     rating: Number(c.rating),
                     reviewsCount: c.reviews_count,

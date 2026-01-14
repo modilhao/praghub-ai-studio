@@ -33,7 +33,6 @@ export const CompanyProfile: React.FC = () => {
                         id: data.id,
                         userId: data.owner_id,
                         name: data.name,
-                        cnpj: data.cnpj,
                         description: data.description,
                         rating: Number(data.rating),
                         reviewsCount: data.reviews_count,

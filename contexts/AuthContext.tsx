@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { User } from '../types';
 import { supabase } from '../lib/supabase';
 
@@ -8,6 +8,7 @@ interface AuthContextType {
     signInWithEmail: (email: string, password: string) => Promise<void>;
     signUpWithEmail: (email: string, password: string) => Promise<any>;
     logout: () => Promise<void>;
+    sessionEvent: 'SIGNED_IN' | 'SIGNED_OUT' | 'TOKEN_REFRESHED' | 'USER_UPDATED' | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,86 +16,122 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [sessionEvent, setSessionEvent] = useState<'SIGNED_IN' | 'SIGNED_OUT' | 'TOKEN_REFRESHED' | 'USER_UPDATED' | null>(null);
+    
+    // Refs para prevenir race conditions
+    const fetchProfileRef = useRef<Promise<User | null> | null>(null);
+    const currentUserIdRef = useRef<string | null>(null);
+    const isFetchingRef = useRef<boolean>(false);
 
-    const fetchProfile = async (userId: string) => {
-        // Tentar buscar o profile
-        let { data: profile, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .single();
+    const fetchProfile = async (userId: string): Promise<User | null> => {
+        // Prevenir múltiplas chamadas simultâneas para o mesmo usuário
+        if ((fetchProfileRef.current && currentUserIdRef.current === userId) || 
+            (isFetchingRef.current && currentUserIdRef.current === userId)) {
+            return fetchProfileRef.current || Promise.resolve(null);
+        }
+        
+        // Marcar como "em execução" antes de iniciar
+        isFetchingRef.current = true;
+        currentUserIdRef.current = userId;
+        
+        // Criar promise e armazenar no ref
+        const profilePromise = (async () => {
+            // Tentar buscar o profile
+            let { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
 
-        // Se o profile não existe, tentar criar (fallback se o trigger falhou)
-        if (error || !profile) {
-            console.warn('Profile não encontrado, tentando criar...', error);
-            
-            // Buscar dados do usuário autenticado
-            const { data: { user: authUser } } = await supabase.auth.getUser();
-            
-            if (authUser) {
-                // Criar profile com dados do auth user
-                const { data: newProfile, error: createError } = await supabase
-                    .from('profiles')
-                    .insert({
-                        id: userId,
-                        email: authUser.email || '',
-                        name: authUser.user_metadata?.name || authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'Usuário',
-                        picture: authUser.user_metadata?.picture || authUser.user_metadata?.avatar_url || null,
-                        role: 'CUSTOMER'
-                    })
-                    .select()
-                    .single();
+            // Se o profile não existe, tentar criar (fallback se o trigger falhou)
+            if (error || !profile) {
+                console.warn('Profile não encontrado, tentando criar...', error);
+                
+                // Buscar dados do usuário autenticado
+                const { data: { user: authUser } } = await supabase.auth.getUser();
+                
+                if (authUser) {
+                    // Criar profile com dados do auth user
+                    const { data: newProfile, error: createError } = await supabase
+                        .from('profiles')
+                        .insert({
+                            id: userId,
+                            email: authUser.email || '',
+                            name: authUser.user_metadata?.name || authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'Usuário',
+                            picture: authUser.user_metadata?.picture || authUser.user_metadata?.avatar_url || null,
+                            role: 'CUSTOMER'
+                        })
+                        .select()
+                        .single();
 
-                if (createError) {
-                    console.error('Erro ao criar profile:', createError);
-                    // Se ainda assim falhar, retornar um profile básico
-                    return {
-                        id: userId,
-                        email: authUser.email || '',
-                        name: authUser.user_metadata?.name || authUser.user_metadata?.full_name || 'Usuário',
-                        picture: authUser.user_metadata?.picture || authUser.user_metadata?.avatar_url || null,
-                        role: 'CUSTOMER' as const,
-                        createdAt: new Date().toISOString()
-                    } as User;
+                    if (createError) {
+                        console.error('Erro ao criar profile:', createError);
+                        // Se ainda assim falhar, retornar um profile básico
+                        return {
+                            id: userId,
+                            email: authUser.email || '',
+                            name: authUser.user_metadata?.name || authUser.user_metadata?.full_name || 'Usuário',
+                            picture: authUser.user_metadata?.picture || authUser.user_metadata?.avatar_url || null,
+                            role: 'CUSTOMER' as const,
+                            createdAt: new Date().toISOString()
+                        } as User;
+                    }
+                    profile = newProfile;
+                } else {
+                    console.error('Não foi possível obter dados do usuário autenticado');
+                    return null;
                 }
-                profile = newProfile;
-            } else {
-                console.error('Não foi possível obter dados do usuário autenticado');
-                return null;
+            }
+
+            // Self-healing: Check if user owns a company but has wrong role
+            if (profile.role !== 'COMPANY' && profile.role !== 'ADMIN') {
+                const { data: company } = await supabase
+                    .from('companies')
+                    .select('id')
+                    .eq('owner_id', userId)
+                    .maybeSingle();
+
+                if (company) {
+                    // User owns a company, update their role
+                    const { error: updateError } = await supabase
+                        .from('profiles')
+                        .update({ role: 'COMPANY' })
+                        .eq('id', userId);
+
+                    if (updateError) {
+                        console.error('Error updating user role to COMPANY:', updateError);
+                    }
+                    // Force update local profile regardless of DB persistence success
+                    profile.role = 'COMPANY';
+                }
+            }
+
+            return {
+                id: profile.id,
+                email: profile.email,
+                name: profile.name,
+                picture: profile.picture,
+                role: profile.role,
+                createdAt: profile.created_at
+            } as User;
+        })();
+        
+        // Armazenar promise no ref
+        fetchProfileRef.current = profilePromise;
+        
+        try {
+            const result = await profilePromise;
+            return result;
+        } finally {
+            // Limpar referências após conclusão
+            if (fetchProfileRef.current === profilePromise) {
+                fetchProfileRef.current = null;
+                isFetchingRef.current = false;
+                if (currentUserIdRef.current === userId) {
+                    currentUserIdRef.current = null;
+                }
             }
         }
-
-        // Self-healing: Check if user owns a company but has wrong role
-        if (profile.role !== 'COMPANY' && profile.role !== 'ADMIN') {
-            const { data: company } = await supabase
-                .from('companies')
-                .select('id')
-                .eq('owner_id', userId)
-                .maybeSingle();
-
-            if (company) {
-                // User owns a company, update their role
-                const { error: updateError } = await supabase
-                    .from('profiles')
-                    .update({ role: 'COMPANY' })
-                    .eq('id', userId);
-
-                if (updateError) {
-                    console.error('Error updating user role to COMPANY:', updateError);
-                }
-                // Force update local profile regardless of DB persistence success
-                profile.role = 'COMPANY';
-            }
-        }
-
-        return {
-            id: profile.id,
-            email: profile.email,
-            name: profile.name,
-            picture: profile.picture,
-            role: profile.role,
-            createdAt: profile.created_at
-        } as User;
     };
 
     useEffect(() => {
@@ -123,6 +160,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Log apenas para eventos importantes (não INITIAL_SESSION)
             if (event !== 'INITIAL_SESSION') {
                 console.log('Auth state changed:', event, session?.user?.email);
+            }
+            
+            // Atualizar evento de sessão para notificações
+            if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+                setSessionEvent(event);
+                // Limpar evento após um tempo para permitir novas notificações
+                setTimeout(() => setSessionEvent(null), 100);
             }
             
             if (session) {
@@ -164,7 +208,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <AuthContext.Provider value={{ user, isLoading, signInWithEmail, signUpWithEmail, logout }}>
+        <AuthContext.Provider value={{ user, isLoading, signInWithEmail, signUpWithEmail, logout, sessionEvent }}>
             {children}
         </AuthContext.Provider>
     );

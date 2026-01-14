@@ -28,7 +28,6 @@ export interface Company {
   id: string;
   userId?: string;
   name: string;
-  cnpj?: string;
   description?: string; // Campo opcional de descrição
   rating: number;
   reviewsCount: number;
