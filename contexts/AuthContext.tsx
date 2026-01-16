@@ -17,12 +17,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchProfile = async (userId: string) => {
+        // #region agent log
+        fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H2',location:'contexts/AuthContext.tsx:19',message:'fetch_profile_start',data:{userIdSuffix:userId.slice(-4)},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
         // Tentar buscar o profile
         let { data: profile, error } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', userId)
             .single();
+        // #region agent log
+        fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H2',location:'contexts/AuthContext.tsx:26',message:'fetch_profile_result',data:{hasProfile:!!profile,hasError:!!error,errorCode:error?.code||null},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
 
         // Se o profile não existe, tentar criar (fallback se o trigger falhou)
         if (error || !profile) {
@@ -100,26 +106,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         // Check for existing session
         const checkSession = async () => {
+            // #region agent log
+            fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H4',location:'contexts/AuthContext.tsx:102',message:'check_session_start',data:{},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
             const { data: { session }, error } = await supabase.auth.getSession();
             if (error) {
                 console.error('Error getting session:', error);
+                // #region agent log
+                fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H4',location:'contexts/AuthContext.tsx:105',message:'check_session_error',data:{errorMessage:error.message},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
                 setIsLoading(false);
                 return;
             }
             
             if (session) {
+                // #region agent log
+                fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H4',location:'contexts/AuthContext.tsx:110',message:'check_session_has_session',data:{userIdSuffix:session.user.id.slice(-4)},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
                 const profile = await fetchProfile(session.user.id);
                 if (profile) {
                     setUser(profile);
                 }
             }
             setIsLoading(false);
+            // #region agent log
+            fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H4',location:'contexts/AuthContext.tsx:116',message:'check_session_done',data:{hasSession:!!session},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
         };
 
         checkSession();
 
         // Listen for auth changes (ex: login via OAuth, logout, etc)
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            // #region agent log
+            fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H4',location:'contexts/AuthContext.tsx:122',message:'auth_state_change',data:{event,hasSession:!!session},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
             if (session) {
                 const profile = await fetchProfile(session.user.id);
                 if (profile) {
@@ -129,6 +150,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setUser(null);
             }
             setIsLoading(false);
+            // #region agent log
+            fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H4',location:'contexts/AuthContext.tsx:131',message:'auth_state_done',data:{userSet:!!session},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
         });
 
         return () => subscription.unsubscribe();
@@ -153,13 +177,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
      */
     const signInWithEmail = async (email: string, password: string): Promise<User | null> => {
         setIsLoading(true);
+        // #region agent log
+        fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H1',location:'contexts/AuthContext.tsx:155',message:'sign_in_start',data:{emailLen:email.length},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
         try {
             const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            // #region agent log
+            fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H1',location:'contexts/AuthContext.tsx:158',message:'sign_in_result',data:{hasUser:!!data?.user,hasError:!!error},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
             if (error) throw error;
             
             // CRÍTICO: Aguarda o profile ser carregado ANTES de retornar
             // Isso garante que o redirecionamento tenha acesso ao role do usuário
             if (data.user) {
+                // #region agent log
+                fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H3',location:'contexts/AuthContext.tsx:163',message:'before_fetch_profile',data:{userIdSuffix:data.user.id.slice(-4)},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
                 const profile = await fetchProfile(data.user.id);
                 if (profile) {
                     setUser(profile);

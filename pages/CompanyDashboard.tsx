@@ -17,10 +17,18 @@ export const CompanyDashboard: React.FC = () => {
     const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
     useEffect(() => {
-        if (!user) return;
+        if (!user) {
+            // #region agent log
+            fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H6',location:'pages/CompanyDashboard.tsx:20',message:'dashboard_no_user_skip_fetch',data:{isLoading},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
+            return;
+        }
 
         const fetchData = async () => {
             setIsLoading(true);
+            // #region agent log
+            fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H7',location:'pages/CompanyDashboard.tsx:23',message:'dashboard_fetch_start',data:{userIdSuffix:user.id.slice(-4)},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
             try {
                 // Fetch company
                 const { data: comp, error: compErr } = await supabase
@@ -29,7 +37,12 @@ export const CompanyDashboard: React.FC = () => {
                     .eq('owner_id', user.id)
                     .maybeSingle();
 
-                if (compErr) throw compErr;
+                if (compErr) {
+                    // #region agent log
+                    fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H7',location:'pages/CompanyDashboard.tsx:32',message:'dashboard_company_error',data:{code:compErr.code||null,message:compErr.message},timestamp:Date.now()})}).catch(()=>{});
+                    // #endregion
+                    throw compErr;
+                }
 
                 if (comp) {
                     const mappedComp: Company = {
@@ -79,7 +92,12 @@ export const CompanyDashboard: React.FC = () => {
                         .eq('company_id', comp.id)
                         .order('created_at', { ascending: false });
 
-                    if (leadsErr) throw leadsErr;
+                    if (leadsErr) {
+                        // #region agent log
+                        fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H7',location:'pages/CompanyDashboard.tsx:82',message:'dashboard_leads_error',data:{code:leadsErr.code||null,message:leadsErr.message},timestamp:Date.now()})}).catch(()=>{});
+                        // #endregion
+                        throw leadsErr;
+                    }
                     if (leadsData) {
                         setLeads(leadsData.map(l => ({
                             id: l.id,
@@ -99,6 +117,9 @@ export const CompanyDashboard: React.FC = () => {
                 console.error('Error fetching dashboard data:', err);
             } finally {
                 setIsLoading(false);
+                // #region agent log
+                fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H7',location:'pages/CompanyDashboard.tsx:101',message:'dashboard_fetch_done',data:{hasCompany:!!companyData,leadsCount:leads.length},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
             }
         };
 

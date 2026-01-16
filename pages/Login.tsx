@@ -27,6 +27,9 @@ export const Login: React.FC = () => {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        // #region agent log
+        fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H1',location:'pages/Login.tsx:30',message:'login_submit',data:{emailLen:email.length,hasPassword:password.length>0},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
         setIsLoading(true);
         try {
             // IMPORTANTE: signInWithEmail retorna o User após carregar o profile
@@ -51,6 +54,9 @@ export const Login: React.FC = () => {
             showToast(errorMessage, 'error');
         } finally {
             setIsLoading(false);
+            // #region agent log
+            fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H1',location:'pages/Login.tsx:56',message:'login_finalize',data:{isLoading:false},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
         }
     };
 

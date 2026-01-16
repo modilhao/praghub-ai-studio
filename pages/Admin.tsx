@@ -31,13 +31,21 @@ export const Admin: React.FC = () => {
 
     const fetchData = async () => {
         setIsLoading(true);
+        // #region agent log
+        fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H8',location:'pages/Admin.tsx:33',message:'admin_fetch_start',data:{},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
         try {
             const { data: compData, error: compErr } = await supabase
                 .from('companies')
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (compErr) throw compErr;
+            if (compErr) {
+                // #region agent log
+                fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H8',location:'pages/Admin.tsx:40',message:'admin_companies_error',data:{code:compErr.code||null,message:compErr.message},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
+                throw compErr;
+            }
 
             if (compData) {
                 setCompanies(compData.map(c => ({
@@ -73,7 +81,12 @@ export const Admin: React.FC = () => {
                 .select('*, companies(name)')
                 .order('created_at', { ascending: false });
 
-            if (leadsErr) throw leadsErr;
+            if (leadsErr) {
+                // #region agent log
+                fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H8',location:'pages/Admin.tsx:76',message:'admin_leads_error',data:{code:leadsErr.code||null,message:leadsErr.message},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
+                throw leadsErr;
+            }
             if (leadsData) {
                 setLeads(leadsData.map(l => ({
                     id: l.id,
@@ -93,6 +106,9 @@ export const Admin: React.FC = () => {
             console.error('Error fetching admin data:', err);
         } finally {
             setIsLoading(false);
+            // #region agent log
+            fetch('http://127.0.0.1:7245/ingest/69870bc7-00ea-4f64-9298-033124960c3c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H8',location:'pages/Admin.tsx:95',message:'admin_fetch_done',data:{companiesCount:companies.length,leadsCount:leads.length},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
         }
     };
 
